@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BD Rail Ticket Alarm</title>
+  <meta name="description" content="A free Brave/Chrome extension that rings an alarm the second Bangladesh Railway tickets for your train go on sale, then highlights BOOK NOW and good seats.">
+  <link rel="icon" href="img/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="in">
+  <a class="brand" href="index.html"><img src="img/icon128.png" alt="">BD Rail Ticket Alarm</a>
+  <nav>
+    <a class="on" href="index.html">Guide</a>
+    <a href="how-it-works.html">How it works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm">GitHub</a>
+    <a class="lang" href="bn.html" lang="bn">বাংলা</a>
+  </nav>
+</div></header>
+
+<div class="hero"><div class="in">
+  <h1>Never miss the 10-day ticket release again</h1>
+  <p>BD Rail Ticket Alarm watches for your train the second its tickets go on sale, rings a loud alarm,
+     and lights up the BOOK NOW button and good seats on the site. You click, you pay. Nothing is booked behind your back.</p>
+  <div class="btns">
+    <a class="btn" href="#install">Install</a>
+    <a class="btn ghost" href="#use">How to use</a>
+    <a class="btn ghost" href="bn.html" lang="bn">বাংলায় পড়ুন</a>
+  </div>
+</div></div>
+
+<main>
+
+<div class="warn"><b>Not official.</b> This is a free, personal project. It is not made by, approved by, or connected to
+Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (train.shohoz.com) on time.</div>
+
+<section id="what">
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>📅 Pick a travel date</h3><p>Tap your journey date on a calendar. It works out when those tickets open: 10 days before, at 8 AM or 2 PM depending on the train.</p></div>
+    <div class="card"><h3>⏱️ Counts down</h3><p>A big countdown card, plus reminders a day before and an hour before.</p></div>
+    <div class="card"><h3>🔔 Rings when seats open</h3><p>At the release second it checks for your train. The moment your class has online seats, a loud alarm rings.</p></div>
+    <div class="card"><h3>✨ Lights up BOOK NOW</h3><p>The page jumps to your train and its BOOK NOW button glows yellow.</p></div>
+    <div class="card"><h3>🪑 Outlines good seats</h3><p>In the seat map it outlines seats in the middle of the coach, side by side if you need two or more.</p></div>
+    <div class="card"><h3>🛡️ Gentle on the server</h3><p>About one check per second, only after release, stops early, slows down when asked. Never touches the bot check.</p></div>
+  </div>
+  <figure><img src="img/screenshot-1.png" alt="The extension panel with a countdown to the next ticket release"><figcaption>The panel: route, date, train, seats — and a countdown to release time.</figcaption></figure>
+  <figure><img src="img/screenshot-2.png" alt="The ticket page with the BOOK NOW button glowing and the alarm ringing"><figcaption>When seats open: the alarm rings and BOOK NOW glows.</figcaption></figure>
+  <figure><img src="img/screenshot-3.png" alt="A seat map with two side-by-side seats outlined in yellow"><figcaption>In the seat map, good seats are outlined. You click them yourself.</figcaption></figure>
+</section>
+
+<section id="need">
+  <h2>What you need</h2>
+  <ul>
+    <li>A computer with <b>Brave</b> or <b>Google Chrome</b> (or another Chromium browser like Edge). Phones are not supported.</li>
+    <li>An account on <a href="https://train.shohoz.com">train.shohoz.com</a>, logged in on that browser.</li>
+    <li>The browser open and the computer awake at release time — the extension can't wake a sleeping computer.</li>
+  </ul>
+</section>
+
+<section id="install">
+  <h2>Install</h2>
+  <h3>Option A — Chrome Web Store (easiest)</h3>
+  <p>Open the store link and press <b>Add to Chrome</b> (works in Brave too). Updates install automatically.</p>
+  <div class="note">The store link is shared privately (the listing is <i>unlisted</i>). If you don't have it, use option B.</div>
+
+  <h3>Option B — from GitHub</h3>
+  <ol class="steps">
+    <li>Download the latest zip from the <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/releases">Releases page</a> and unzip it.
+        (Or press <b>Code → Download ZIP</b> on the GitHub page and use the <code>shohoz-autobook</code> folder inside.)</li>
+    <li>Open <code>brave://extensions</code> (or <code>chrome://extensions</code>).</li>
+    <li>Turn on <b>Developer mode</b> (top-right switch).</li>
+    <li>Press <b>Load unpacked</b> and choose the unzipped folder (the one that has <code>manifest.json</code> in it).</li>
+    <li>Pin the 🔔 icon to the toolbar. Click it to open the panel.</li>
+  </ol>
+  <div class="note">Keep that folder where it is. If you move or delete it, the browser removes the extension and its settings.</div>
+</section>
+
+<section id="use">
+  <h2>How to use</h2>
+  <p>The panel has five numbered steps. A finished step folds to one line with a ✓ — tap it to open it again.
+     The <b>বাং</b> button at the top switches the whole panel to Bangla.</p>
+  <ol class="steps">
+    <li><b>Log in.</b> Open train.shohoz.com and log in. The panel shows a green ✓ when it sees you're logged in. (You always log in yourself — the extension never asks for your password.)</li>
+    <li><b>Route.</b> Type the From and To stations and pick them from the suggestions.</li>
+    <li><b>Date.</b> Tap your travel date. The line underneath says when those tickets go on sale.</li>
+    <li><b>Train.</b> Press <b>⟳ Load trains</b> and pick yours. The list shows departure → arrival times. The release time (8 AM or 2 PM) is set for you from the train.</li>
+    <li><b>Seats &amp; class.</b> Choose the class (for example <code>S_CHAIR</code>), how many seats (1–4), and optionally preferred coaches (<code>THA,TA</code>) or exact seats (<code>THA-21,THA-22</code>).</li>
+    <li><b>ARM.</b> Press <b>ARM</b>. The button turns red and a green card counts down. You can close the panel now.</li>
+  </ol>
+  <div class="note"><b>Try it first.</b> Pick a date that's already on sale and press <b>▶ Test run now</b>. You'll hear the alarm and see BOOK NOW light up, so nothing surprises you on the real day.</div>
+</section>
+
+<section id="release">
+  <h2>What happens at release time</h2>
+  <div class="tablewrap"><table>
+    <tr><th>When</th><th>What happens</th></tr>
+    <tr><td>1 day before</td><td>Reminder notification: “Tickets open tomorrow”.</td></tr>
+    <tr><td>1 hour before</td><td>Reminder notification. Check you're logged in.</td></tr>
+    <tr><td>~75 seconds before</td><td>A train.shohoz.com tab opens with a small status box at the bottom-right.</td></tr>
+    <tr><td>Release second</td><td>It starts checking for your train, about once a second.</td></tr>
+    <tr><td>Seats appear</td><td>🔔 Alarm + notification. The page reloads, scrolls to your train, and your class's BOOK NOW glows.</td></tr>
+    <tr><td>You click BOOK NOW</td><td>The seat map opens with the best seats outlined. If another coach has more free seats, the status box says which.</td></tr>
+    <tr><td>You finish</td><td>Click the outlined seats → <b>CONTINUE PURCHASE</b> → OTP → payment.</td></tr>
+  </table></div>
+  <p>Click anywhere on the page to stop the alarm. Press <b>■ STOP</b> (in the panel or on the page) to stop everything.</p>
+  <p>If nothing opens within 5 minutes (changeable under <i>Advanced</i>), it gives up and tells you.</p>
+</section>
+
+<section id="seats">
+  <h2>How it chooses seats to outline</h2>
+  <ol>
+    <li><b>Your exact seats</b>, if you typed some and they're free.</li>
+    <li><b>Your preferred coaches</b>, in the order you typed them.</li>
+    <li>Otherwise the <b>middle part of the coach</b> — away from doors, toilets and wheels.</li>
+    <li>For 2 or more tickets, <b>seats next to each other</b>, as close to the middle as possible.</li>
+  </ol>
+  <p>It only outlines. You do the clicking, so you can always pick something else.</p>
+</section>
+
+<section id="buttons">
+  <h2>Buttons</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Button</th><th>What it does</th></tr>
+    <tr><td><b>ARM</b></td><td>Sets it to run at the release time. Red means armed — press again to cancel.</td></tr>
+    <tr><td><b>▶ Test run now</b></td><td>Runs right away. Use it on a date that's already on sale.</td></tr>
+    <tr><td><b>■ STOP</b></td><td>Stops the current run and the alarm.</td></tr>
+    <tr><td><b>Tools → 📊 Check seats now</b></td><td>Shows how many online seats each class has right now.</td></tr>
+    <tr><td><b>Tools → 💾 Saved trips</b></td><td>Save a route + train once, load it later in one click.</td></tr>
+    <tr><td><b>Tools → 🔔 Test alarm sound</b></td><td>Hear the alarm so you can set your volume.</td></tr>
+    <tr><td><b>⧉ open as tab</b></td><td>Opens the panel in a tab so it doesn't close when you click away.</td></tr>
+    <tr><td><b>Advanced</b></td><td>Override the release time, change check speed or how long it keeps trying.</td></tr>
+  </table></div>
+</section>
+
+<section id="safe">
+  <h2>Staying safe from blocks</h2>
+  <p>If a computer asks the ticket server for data too often, the server answers
+     “You are requesting too frequently” and blocks it for a while. The extension is built to stay well inside normal use:</p>
+  <ul>
+    <li><b>Nothing before release time.</b> If your date isn't on sale yet, it refuses to start instead of checking for nothing.</li>
+    <li><b>About one check per second</b>, only for a few minutes, and it stops the moment your seats appear.</li>
+    <li><b>Slows down when told to</b> — waits 2, 4, 8, then 15 seconds.</li>
+    <li><b>Never touches the seat map's bot check</b> (the “are you human?” check). You open the seat map yourself.</li>
+    <li><b>Never logs in for you</b> and never fills in OTP or payment.</li>
+  </ul>
+  <p>Your part: don't run tests again and again on dates that aren't on sale, and use one computer per trip.
+     Want the details? Read <a href="how-it-works.html">How it works</a>.</p>
+</section>
+
+<section id="trouble">
+  <h2>If something goes wrong</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Problem</th><th>What to do</th></tr>
+    <tr><td>“You are requesting too frequently”</td><td>Press ■ STOP, close the tab, wait 15–30 minutes.</td></tr>
+    <tr><td>Red ✖ not logged in</td><td>Log in at train.shohoz.com, then press ↻ re-check.</td></tr>
+    <tr><td>“Session expired” in the status box</td><td>Log in again. The alarm rings so you notice.</td></tr>
+    <tr><td>No trains in the list</td><td>Open train.shohoz.com in a tab, log in, then press ⟳ Load trains.</td></tr>
+    <tr><td>No sound</td><td>Tools → 🔔 Test alarm sound. Check the computer volume and that the browser isn't muted.</td></tr>
+    <tr><td>No notifications</td><td>Allow notifications for the browser in your computer's settings, and turn off Do Not Disturb.</td></tr>
+    <tr><td>Changed train or date after arming</td><td>Press ARM to cancel, then ARM again.</td></tr>
+    <tr><td>BOOK NOW didn't glow</td><td>The site may have changed its layout. Scroll to your train yourself and please <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/issues">report it</a>.</td></tr>
+  </table></div>
+</section>
+
+<section id="faq">
+  <h2>Questions</h2>
+  <details><summary>Does it buy the ticket for me?</summary>
+    <p>No. It finds the moment seats open, alerts you and points at the right buttons. Choosing seats, OTP and payment are always yours.</p></details>
+  <details><summary>Why doesn't it pick the seats itself?</summary>
+    <p>The site protects the seat map with a bot check. Getting around it would break the site's rules and put your account at risk, so the extension deliberately leaves that step to you.</p></details>
+  <details><summary>Does it know my password?</summary>
+    <p>No. You log in on the website yourself. The extension only uses the login session the website already keeps in your browser, and only to talk to the ticket website. See <a href="privacy.html">Privacy</a>.</p></details>
+  <details><summary>Does it guarantee a ticket?</summary>
+    <p>No. Popular trains sell out in seconds and thousands of people try at once. It saves you the seconds of noticing and finding your train — the rest depends on you and on luck.</p></details>
+  <details><summary>Can I watch several trains or dates?</summary>
+    <p>One trip per ARM. Use <i>Saved trips</i> to switch quickly.</p></details>
+  <details><summary>Does it work on a phone?</summary>
+    <p>No — mobile browsers don't run these extensions.</p></details>
+</section>
+
+</main>
+
+<footer><div class="in">
+  BD Rail Ticket Alarm · free and open source (MIT) ·
+  <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm">GitHub</a> ·
+  <a href="privacy.html">Privacy</a> ·
+  Not affiliated with Bangladesh Railway or Shohoz. Use at your own risk.
+</div></footer>
+</body>
+</html>

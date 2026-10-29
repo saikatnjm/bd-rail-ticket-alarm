@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How It Works · BD Rail Ticket Alarm</title>
+  <meta name="description" content="How BD Rail Ticket Alarm works under the hood, what it does to avoid getting you blocked, and its honest limits.">
+  <link rel="icon" href="img/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="in">
+  <a class="brand" href="index.html"><img src="img/icon128.png" alt="">BD Rail Ticket Alarm</a>
+  <nav>
+    <a href="index.html">Guide</a>
+    <a class="on" href="how-it-works.html">How it works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm">GitHub</a>
+    <a class="lang" href="how-it-works-bn.html" lang="bn">বাংলা</a>
+  </nav>
+</div></header>
+
+<main>
+<section>
+  <h2>The short version</h2>
+  <p>The extension is a <b>timer plus a polite watcher</b>. It waits until the exact second your tickets go on sale,
+     asks the ticket website “is my train open yet?” about once a second, and when the answer is yes it
+     <b>rings an alarm and points at the buttons you need to press</b>. It never presses them for you.</p>
+  <p>It doesn't try to look like a human, and it doesn't try to hide from bot detection.
+     It stays safe by <b>asking rarely, for a short time, only when there's a reason to</b>, and by
+     <b>staying completely out of the site's bot check</b>.</p>
+</section>
+
+<section>
+  <h2>The pieces</h2>
+  <div class="tablewrap"><table>
+    <tr><th>File</th><th>Runs where</th><th>Job</th></tr>
+    <tr><td><code>popup.html</code> / <code>popup.js</code></td><td>The toolbar panel</td><td>Calendar, route/train/seat form, ARM, countdown, saved trips, history, English/Bangla.</td></tr>
+    <tr><td><code>background.js</code></td><td>Service worker</td><td>Works out the release time, sets <code>chrome.alarms</code> (main + 1-day + 1-hour reminders), opens the site tab ~75 s early, shows notifications, starts/stops the alarm sound.</td></tr>
+    <tr><td><code>content.js</code></td><td>Inside train.shohoz.com</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining.</td></tr>
+    <tr><td><code>offscreen.html</code> / <code>offscreen.js</code></td><td>Hidden extension page</td><td>Plays the siren (Web Audio oscillator).</td></tr>
+    <tr><td><code>rail-data.js</code></td><td>Popup, worker, page</td><td>Bundled station list, train names, and each train's release time and zone (EAST 2 PM / WEST 8 AM).</td></tr>
+    <tr><td><code>i18n.js</code></td><td>Popup</td><td>English and Bangla text.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Timeline of one run</h2>
+<pre><code>ARM pressed (popup)
+  └─ background: release time = journey date − 10 days, at 8 AM or 2 PM (from the train's zone)
+     sets alarms at  T−24h (reminder) · T−1h (reminder) · T−75s (launch)
+
+T−75s   background opens (or reuses) a train.shohoz.com tab and saves a "mission"
+        content.js picks up the mission:
+          1. logged in?            no  → alarm + notification, stop
+          2. date released inside this run's window?  no → stop (don't search for nothing)
+          3. one request for a small static file → read the server's Date header
+             → estimate the clock difference (about ±0.5 s)
+
+T−0.5s  search loop: GET /bookings/search-trips-v2   (the same call the site's Search button makes)
+          wait 700 ms + random 0–250 ms between searches  (≈ 1 per second)
+          429 "too many requests" → wait 2 s, 4 s, 8 s, 15 s …
+          401 "logged out"        → alarm + notification, stop
+          5 minutes passed        → give up, notify
+
+Seats!  save a short "found" note, send a notification,
+        load the site's own results page for that train and class
+
+Reload  content.js sees the note → alarm on, scroll to the train, make BOOK NOW glow
+User    clicks BOOK NOW → the site loads the seat map (and runs its own bot check — untouched)
+        content.js watches the page (MutationObserver) → outlines the best free seats
+        ← zero network requests from the extension in this step
+User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
+</section>
+
+<section>
+  <h2>Where the login comes from</h2>
+  <p>You log in on the website as usual. The website keeps your session in the page's <code>localStorage</code>
+     (a token plus a device ID and key). The watcher reads those and sends them with its searches as the same
+     headers the website itself uses (<code>Authorization</code>, <code>X-Device-Id</code>, <code>X-Device-Key</code>).
+     They are only ever sent to Shohoz's own API, never stored by the extension and never sent anywhere else.
+     Your password is never seen.</p>
+</section>
+
+<section>
+  <h2>Why the alarm plays from a hidden page</h2>
+  <p>Browsers block sound on a page until you click it (the “autoplay policy”). The tab that opens at release
+     time was opened automatically, so it isn't allowed to make noise. Extensions are allowed to play sound
+     from an <i>offscreen document</i>, so the siren runs there instead. That's also what
+     <b>Tools → Test alarm sound</b> uses, so the test is honest.</p>
+</section>
+
+<section id="human">
+  <h2>“Does it act like a human?” — honestly, no</h2>
+  <p>It helps to be precise here, because “mimicking humans” usually means tricks to fool bot detection.
+     This extension doesn't do those, on purpose.</p>
+  <h3>What it does</h3>
+  <ul>
+    <li>Calls the <b>same search endpoint</b> the site's Search button calls, <b>from the site's own tab</b>, with <b>your own session</b>.</li>
+    <li>Searches about <b>once a second</b> — roughly a person hammering refresh — with a small random gap (0–250 ms) so it isn't a perfect metronome.</li>
+    <li>Runs only for a <b>short window</b> (a few minutes at most) right at release time.</li>
+  </ul>
+  <h3>What it doesn't do</h3>
+  <ul>
+    <li>No fake mouse movement, fake typing, browser-fingerprint changes or user-agent tricks.</li>
+    <li>No extra accounts, proxies or IP rotation.</li>
+    <li>No solving, skipping, generating or replaying the site's bot-check (Cloudflare Turnstile) token.</li>
+    <li>No automatic login, OTP entry, seat reserving or payment.</li>
+  </ul>
+  <div class="note">The random gap is <b>not a disguise</b>. A server that looks closely can still tell these
+    requests come from a script: evenly spaced API calls starting at exactly 2:00:00 PM with no clicks on the page.
+    The protection comes from <b>volume and timing</b> — staying inside what the server tolerates — not from hiding.</div>
+</section>
+
+<section id="protection">
+  <h2>What it does to avoid getting you blocked</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Measure</th><th>Why</th><th>Where</th></tr>
+    <tr><td>Refuses to start before release</td><td>If the date won't open within this run's window, searching is pointless and only adds up requests. The run stops with a message.</td><td><code>content.js</code> · <code>runEngine()</code></td></tr>
+    <tr><td>Starts 0.5 s before release, on the server's clock</td><td>No early searching “just in case”. Clock offset comes from one HTTP Date header.</td><td><code>serverOffsetMs()</code>, <code>startLeadMs</code></td></tr>
+    <tr><td>≈ 1 search per second</td><td>700 ms + 0–250 ms random, plus request time. Configurable (minimum 300 ms) — <b>don't lower it</b>.</td><td><code>pollIntervalMs</code></td></tr>
+    <tr><td>Backs off on 429</td><td>When the server says “too frequent”, waits 2 → 4 → 8 → 15 s before trying again.</td><td>search loop</td></tr>
+    <tr><td>Stops at the first hit</td><td>As soon as your class shows online seats, searching ends.</td><td>search loop</td></tr>
+    <tr><td>Hard time limit</td><td>Gives up after 5 minutes (max 15). Worst case ≈ 300 searches.</td><td><code>maxWaitMinutes</code></td></tr>
+    <tr><td>Stops on 401</td><td>A logged-out session isn't retried.</td><td>search loop</td></tr>
+    <tr><td>Seat help is offline</td><td>Seat outlining only reads the page that's already loaded. Switching coaches makes no requests.</td><td><code>suggestSeats()</code></td></tr>
+    <tr><td>Never touches the bot check</td><td>The seat-map request needs a Turnstile token. The extension never calls it — you open the seat map with your click.</td><td>—</td></tr>
+    <tr><td>STOP button everywhere</td><td>Panel and on-page status box both abort immediately.</td><td><code>stopRun</code></td></tr>
+  </table></div>
+  <p>Your side of it: don't test repeatedly on dates that aren't on sale, don't arm two computers for the same trip,
+     and don't open many shohoz tabs during a run.</p>
+</section>
+
+<section id="limits">
+  <h2>Limitations</h2>
+  <ul>
+    <li><b>You are the speed limit after the alarm.</b> BOOK NOW → seat map → seats → CONTINUE → OTP → payment is all you.
+        The extension only saves the seconds of noticing and finding your train. Seats can go while you click.</li>
+    <li><b>It relies on an undocumented website.</b> The search API's response shape and the page's CSS classes
+        (<code>.book-now-btn</code>, <code>.btn-seat</code>, <code>seat-available</code>…) can change at any time.
+        If they do, the glow or the seat outlines quietly stop working. Do a <i>Test run now</i> before an important trip.</li>
+    <li><b>Release times are a bundled table.</b> If the railway changes a train's zone or opening hour,
+        <code>rail-data.js</code> needs an update — or override it under <i>Advanced</i>.</li>
+    <li><b>The computer has to be on.</b> A sleeping laptop or a closed browser means the alarm fires late or not at all.</li>
+    <li><b>One trip per ARM.</b> One route, date and train. The search asks for your first class; the others in your list are picked from the same results.</li>
+    <li><b>Online seats only.</b> The site's numbers mix counter and online quotas; only online seats count.</li>
+    <li><b>Seat outlines see one coach at a time</b> — the one on screen. The “fuller coach” hint comes from the coach dropdown.</li>
+    <li><b>Clock accuracy is about half a second.</b> Plenty for this, but not millisecond-exact.</li>
+    <li><b>Desktop only.</b> No phone browsers.</li>
+  </ul>
+</section>
+
+<section id="drawbacks">
+  <h2>Drawbacks and risks</h2>
+  <ul>
+    <li><b>No guarantee against blocks.</b> One search a second for a few minutes is faster than most people click.
+        If Shohoz tightens its limits you can still get a temporary “requesting too frequently” block.
+        Account action is unlikely at this volume, but nobody can promise it.</li>
+    <li><b>It's visible.</b> As described above, the pattern is recognisable. If Shohoz decides to block tools like this,
+        it will stop working, and there's no plan to fight that.</li>
+    <li><b>Session access.</b> Like any extension that can read the site, it can see your login session. This one only sends it to Shohoz.
+        The code is short and open — read it before installing.</li>
+    <li><b>Rules.</b> Check the ticket website's terms yourself. This is meant for buying your own tickets, not reselling.</li>
+    <li><b>Fairness at scale.</b> If everyone ran it, nobody would have an edge and the server would get busier.
+        That's why the extension stays modest and the Web Store listing is unlisted.</li>
+  </ul>
+</section>
+
+<section id="dev">
+  <h2>Working on the code</h2>
+  <ol class="steps">
+    <li>Clone the repo. The extension is in the <code>shohoz-autobook/</code> folder.</li>
+    <li><code>brave://extensions</code> → Developer mode → <b>Load unpacked</b> → choose that folder.</li>
+    <li>After editing, press ↻ on the extension card and reload the shohoz tab.</li>
+    <li>Test on a date that's <b>already on sale</b> with <b>▶ Test run now</b>. Open the status box's <i>details ▾</i> for the log.</li>
+  </ol>
+  <h3>Useful constants</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Setting</th><th>Default</th><th>Where</th></tr>
+    <tr><td>Open the tab before release</td><td>75 s</td><td><code>PRELAUNCH_LEAD_MS</code> in <code>background.js</code></td></tr>
+    <tr><td>Start searching before release</td><td>500 ms</td><td><code>startLeadMs</code> in <code>background.js</code> defaults</td></tr>
+    <tr><td>Gap between searches</td><td>700 ms + 0–250 ms</td><td><code>pollIntervalMs</code> (panel → Advanced)</td></tr>
+    <tr><td>Give up after</td><td>5 min</td><td><code>maxWaitMinutes</code> (panel → Advanced)</td></tr>
+    <tr><td>“Seats open” handoff stays active</td><td>15 min</td><td><code>ASSIST_TTL_MS</code> in <code>content.js</code></td></tr>
+    <tr><td>Sale window</td><td>10 days</td><td><code>SALE_WINDOW_DAYS</code></td></tr>
+  </table></div>
+  <h3>Contributing</h3>
+  <p>Issues and pull requests are welcome — especially fixes when the site's layout changes, release-time updates and translation fixes.
+     Changes that get around the bot check, automate login/OTP/payment or raise the request rate won't be accepted.</p>
+</section>
+</main>
+
+<footer><div class="in">
+  BD Rail Ticket Alarm · MIT licence ·
+  <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm">GitHub</a> ·
+  Not affiliated with Bangladesh Railway or Shohoz.
+</div></footer>
+</body>
+</html>

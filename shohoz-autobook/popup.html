@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { width: 340px; font: 13px/1.45 system-ui, sans-serif; margin: 0; background: #0e1b14; color: #e7f6ec; }
+    .wrap { padding: 12px 14px 14px; }
+    h1 { font-size: 15px; margin: 0 0 10px; color: #6fe3a5; }
+    label { display: block; margin: 7px 0 2px; color: #9adbb8; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+    input, select { width: 100%; box-sizing: border-box; background: #132b1f; color: #e7f6ec; border: 1px solid #275c43; border-radius: 6px; padding: 6px 8px; font: inherit; }
+    input:disabled, select:disabled, button:disabled { opacity: .45; }
+    .row { display: flex; gap: 8px; }
+    .row > div { flex: 1; }
+    .check { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+    .check input { width: auto; }
+    button { margin-top: 10px; width: 100%; padding: 8px; border: none; border-radius: 7px; font: inherit; font-weight: 600; cursor: pointer; }
+    #arm { background: #1f9e63; color: #fff; }
+    #arm.armed { background: #c0392b; }
+    .minor { background: #1c3a2b; color: #bfe9d2; }
+    #status { margin-top: 10px; padding: 8px; border-radius: 7px; background: #132b1f; color: #ffd166; font-size: 12px; min-height: 16px; white-space: pre-wrap; }
+    .hint { color: #7fae95; font-size: 11px; margin-top: 2px; }
+    #dojPreview { color: #6fe3a5; font-size: 12px; margin-top: 4px; }
+    .cal { background: #fff; border-radius: 8px; overflow: hidden; margin-top: 4px; user-select: none; }
+    .cal.disabled { opacity: .45; pointer-events: none; }
+    .cal-head { display: flex; justify-content: space-between; align-items: center; background: #1f9e63; color: #fff; padding: 6px 8px; font-weight: 700; font-size: 13px; }
+    .cal-head button { all: unset; cursor: pointer; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; background: rgba(255,255,255,.18); margin: 0; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 4px 6px 8px; gap: 2px; }
+    .cal-dow { color: #1f9e63; font-weight: 700; font-size: 11px; text-align: center; padding: 4px 0; }
+    .cal-day { all: unset; box-sizing: border-box; text-align: center; font-size: 12px; color: #333; padding: 5px 0; border-radius: 4px; cursor: pointer; }
+    .cal-day:hover:not(:disabled) { background: #d9f2e6; }
+    .cal-day:disabled { color: #c9c9c9; cursor: default; }
+    .cal-day.sel { background: #1f9e63; color: #fff; font-weight: 700; }
+    .cal-day.today { outline: 1px solid #1f9e63; }
+    .linkbtn { all: unset; cursor: pointer; color: #9adbb8; font-size: 11px; }
+    #langToggle { all: unset; cursor: pointer; font-size: 12px; font-weight: 700; color: #0e1b14; background: #6fe3a5; border-radius: 5px; padding: 2px 8px; }
+    .step { display: flex; align-items: center; gap: 7px; margin: 10px 0 4px; cursor: pointer; background: #132b1f; border: 1px solid #275c43; border-radius: 7px; padding: 7px 10px; transition: border-color .12s, background .12s; }
+    .step.foldable:hover { border-color: #4fbe8a; background: #173526; }
+    .step.static { cursor: default; }
+    .stepsum { color: #9adbb8; font-size: 11.5px; margin-left: auto; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stepchev { color: #7fae95; font-size: 10px; width: 10px; text-align: center; }
+    .stepnum { background: #1f9e63; color: #fff; border-radius: 50%; min-width: 18px; height: 18px; line-height: 18px; text-align: center; font-size: 11px; font-weight: 700; }
+    .steplabel { color: #bfe9d2; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .steptick { color: #6fe3a5; font-weight: 700; visibility: hidden; }
+    .step.done .steptick { visibility: visible; }
+    .step.done .stepnum { background: #275c43; }
+    #nextCard { display: none; margin: 8px 0; padding: 10px 12px; border-radius: 9px; background: linear-gradient(135deg, #14532d, #1f9e63); color: #fff; }
+    #nextCard .nc-title { font-size: 10px; letter-spacing: .12em; opacity: .8; font-weight: 700; }
+    #nextCard .nc-what { font-size: 13px; font-weight: 700; margin: 3px 0 1px; }
+    #nextCard .nc-count { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    #nextCard .nc-when { font-size: 11px; opacity: .85; }
+    .presetRow { display: flex; gap: 6px; align-items: center; }
+    .presetRow select { flex: 1; }
+    .presetRow button { width: auto; margin: 0; padding: 6px 9px; }
+    details { margin-top: 10px; }
+    summary { cursor: pointer; color: #9adbb8; font-size: 12px; }
+    #historyBox { font-size: 11.5px; margin-top: 6px; }
+    #historyBox div { padding: 3px 0; border-bottom: 1px solid #1c3a2b; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <h1 data-i18n="title">🚆 BD Rail Ticket Alarm</h1>
+      <span style="white-space:nowrap">
+        <button id="langToggle">বাং</button>
+        <button id="openTab" class="linkbtn" data-i18n="openTab">⧉ open as tab</button>
+      </span>
+    </div>
+    <div id="loginStatus" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:0 0 6px;padding:5px 8px;border-radius:6px;background:#132b1f">
+      <span id="loginText">…</span>
+      <button id="loginCheck" class="linkbtn" data-i18n="recheck">↻ re-check</button>
+    </div>
+
+    <div id="nextCard">
+      <div class="nc-title" data-i18n="nextBooking">NEXT BOOKING</div>
+      <div class="nc-what" id="ncWhat"></div>
+      <div class="nc-count" id="ncCount"></div>
+      <div class="nc-when" id="ncWhen"></div>
+    </div>
+
+
+    <div class="step" id="st1"><span class="stepnum">1</span><span class="steplabel" data-i18n="stepRoute">Route</span><span class="steptick">✓</span><span class="stepsum" id="ss1"></span><span class="stepchev" id="sc1"></span></div>
+    <div id="sb1">
+      <div class="row">
+        <div><label data-i18n="from">From</label><input id="fromCity" list="stationsList" autocomplete="off" data-i18n-ph="fromPh" /></div>
+        <div><label data-i18n="to">To</label><input id="toCity" list="stationsList" autocomplete="off" data-i18n-ph="toPh" /></div>
+      </div>
+      <datalist id="stationsList"></datalist>
+    </div>
+
+    <div class="step" id="st2"><span class="stepnum">2</span><span class="steplabel" data-i18n="stepDate">Date</span><span class="steptick">✓</span><span class="stepsum" id="ss2"></span><span class="stepchev" id="sc2"></span></div>
+    <div id="sb2">
+      <div id="cal" class="cal"></div>
+    </div>
+    <input type="hidden" id="journeyDate" />
+    <div id="dojPreview"></div>
+
+    <div class="step" id="st3"><span class="stepnum">3</span><span class="steplabel" data-i18n="stepTrain">Train</span><span class="steptick">✓</span><span class="stepsum" id="ss3"></span><span class="stepchev" id="sc3"></span></div>
+    <div id="sb3">
+      <button id="loadTrains" class="minor" data-i18n="loadTrains" disabled style="margin-top:4px">⟳ Load trains for this route</button>
+      <select id="trainSelect" disabled style="margin-top:6px">
+        <option value="" data-i18n="loadFirst">— load trains, or pick any with seats —</option>
+      </select>
+      <input id="trainQuery" list="allTrainsList" autocomplete="off" style="margin-top:6px" data-i18n-ph="trainPh" />
+      <datalist id="allTrainsList"></datalist>
+    </div>
+    <div id="trainInfo" class="hint"></div>
+
+    <div class="step" id="st4"><span class="stepnum">4</span><span class="steplabel" data-i18n="stepSeats">Seats & class</span><span class="steptick">✓</span><span class="stepsum" id="ss4"></span><span class="stepchev" id="sc4"></span></div>
+    <div id="sb4">
+      <label data-i18n="classPriority">Class priority (comma-separated, tried in order)</label>
+      <input id="classPriority" list="classList" autocomplete="off" data-i18n-ph="classPh" />
+      <datalist id="classList"></datalist>
+
+      <div class="row">
+        <div><label data-i18n="seats">Seats</label><input id="seatCount" type="number" min="1" max="4" /></div>
+        <div><label data-i18n="prefCoaches">Pref. coaches</label><input id="preferredCoaches" data-i18n-ph="coachesPh" /></div>
+      </div>
+
+      <label data-i18n="prefSeats">Exact preferred seats (optional)</label>
+      <input id="preferredSeats" data-i18n-ph="seatsPh" />
+    </div>
+
+    <details>
+      <summary data-i18n="advanced">Advanced</summary>
+      <label data-i18n="releaseOverride">Release time (Auto = from train's zone)</label>
+      <select id="triggerTime"></select>
+      <div class="row">
+        <div><label data-i18n="poll">Poll (ms)</label><input id="pollIntervalMs" type="number" min="300" /></div>
+        <div><label data-i18n="maxWait">Max wait (min)</label><input id="maxWaitMinutes" type="number" min="1" max="15" /></div>
+      </div>
+    </details>
+
+    <div class="step static" id="st5"><span class="stepnum">5</span><span class="steplabel" data-i18n="stepGo">Go</span><span class="steptick">✓</span></div>
+    <button id="arm" data-i18n="arm">ARM for release time</button>
+    <button id="runNow" class="minor" data-i18n="testNow">▶ Test run now</button>
+    <button id="stopRun" style="background:#c0392b;color:#fff" data-i18n="stopRun">■ STOP current run</button>
+    <details id="toolsBox">
+      <summary data-i18n="tools">Tools</summary>
+      <label data-i18n="presets">Saved trips</label>
+      <div class="presetRow">
+        <select id="presetSelect"><option value="" data-i18n="presetPick">— pick a saved trip —</option></select>
+        <button id="savePreset" class="minor" data-i18n="savePreset">💾 Save</button>
+        <button id="delPreset" class="minor" data-i18n="delPreset">✕</button>
+      </div>
+      <button id="checkSeats" class="minor" data-i18n="checkSeats">📊 Check seats now</button>
+      <button id="soundTest" class="minor" data-i18n="soundTest">🔔 Test alarm sound</button>
+    </details>
+
+    <div id="status"></div>
+
+    <details>
+      <summary data-i18n="history">Recent runs</summary>
+      <div id="historyBox"></div>
+    </details>
+
+    <div class="hint" data-i18n="hint">OTP, CAPTCHA and payment are always completed by you. Keep Brave running and the computer awake at the release time.</div>
+  </div>
+  <script src="i18n.js"></script>
+  <script src="rail-data.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

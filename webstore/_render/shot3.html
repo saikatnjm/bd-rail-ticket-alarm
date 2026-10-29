@@ -1,0 +1,55 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><style>body{gap:44px;padding:0 56px}.copy h1{font-size:46px}.copy ul{font-size:20px}</style>
+<style>
+ .page { position: relative; width: 660px; height: 680px; background: #f4f6f5; color: #1d2b24; font-size: 14px; }
+ .bar { background: #fff; border-bottom: 1px solid #dde3e0; padding: 12px 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+ .sel { border: 1px solid #c9d2ce; border-radius: 6px; padding: 5px 10px; font-weight: 500; background: #fff; }
+ .grid { display: grid; grid-template-columns: repeat(5, 62px); gap: 6px 8px; padding: 14px 24px; }
+ .seat { font-size: 11px; text-align: center; padding: 6px 0; border-radius: 6px; }
+ .free { background: #e2f4ea; border: 1px solid #2e7d5b; color: #1d5a40; }
+ .booked { background: #dfe3e1; color: #9aa6a0; border: 1px solid #dfe3e1; }
+ .aisle { width: 10px; }
+ .legend { position: absolute; left: 400px; font-size: 12px; top: 70px; font-size: 13px; line-height: 2; color: #44554d; }
+ .legend span { display: inline-block; width: 18px; height: 14px; border-radius: 4px; vertical-align: middle; margin-right: 6px; }
+</style></head><body>
+<div class="copy">
+  <div class="brand"><img src="../../shohoz-autobook/icon128.png">BD Rail Ticket Alarm</div>
+  <h1>Good seats, <em>outlined</em> for you</h1>
+  <ul>
+    <li>Middle of the coach — away from doors</li>
+    <li>Side by side for 2+ tickets</li>
+    <li>Or your own coaches / exact seats</li>
+    <li>Tells you if another coach is emptier</li>
+  </ul>
+</div>
+<div class="frame page">
+  <div class="bar">SUBORNO EXPRESS (702) · S_CHAIR <span class="sel">JHA - 17 Seat(s) ▾</span></div>
+  <div class="grid">
+<span class="seat booked">JHA-1</span><span class="seat booked">JHA-2</span><span class="aisle"></span><span class="seat booked">JHA-3</span><span class="seat booked">JHA-4</span>
+<span class="seat booked">JHA-5</span><span class="seat booked">JHA-6</span><span class="aisle"></span><span class="seat booked">JHA-7</span><span class="seat booked">JHA-8</span>
+<span class="seat booked">JHA-9</span><span class="seat booked">JHA-10</span><span class="aisle"></span><span class="seat booked">JHA-11</span><span class="seat booked">JHA-12</span>
+<span class="seat booked">JHA-13</span><span class="seat booked">JHA-14</span><span class="aisle"></span><span class="seat booked">JHA-15</span><span class="seat free">JHA-16</span>
+<span class="seat free">JHA-17</span><span class="seat free">JHA-18</span><span class="aisle"></span><span class="seat free">JHA-19</span><span class="seat free">JHA-20</span>
+<span class="seat free">JHA-21</span><span class="seat free">JHA-22</span><span class="aisle"></span><span class="seat free">JHA-23</span><span class="seat booked">JHA-24</span>
+<span class="seat booked">JHA-25</span><span class="seat booked">JHA-26</span><span class="aisle"></span><span class="seat free suggest">JHA-27</span><span class="seat free suggest">JHA-28</span>
+<span class="seat free">JHA-29</span><span class="seat free">JHA-30</span><span class="aisle"></span><span class="seat free">JHA-31</span><span class="seat free">JHA-32</span>
+<span class="seat booked">JHA-33</span><span class="seat booked">JHA-34</span><span class="aisle"></span><span class="seat booked">JHA-35</span><span class="seat booked">JHA-36</span>
+<span class="seat booked">JHA-37</span><span class="seat free">JHA-38</span><span class="aisle"></span><span class="seat booked">JHA-39</span><span class="seat booked">JHA-40</span>
+<span class="seat free">JHA-41</span><span class="seat booked">JHA-42</span><span class="aisle"></span><span class="seat booked">JHA-43</span><span class="seat booked">JHA-44</span>
+<span class="seat free">JHA-45</span><span class="seat booked">JHA-46</span><span class="aisle"></span><span class="seat booked">JHA-47</span><span class="seat booked">JHA-48</span>
+<span class="seat booked">JHA-49</span><span class="seat booked">JHA-50</span><span class="aisle"></span><span class="seat booked">JHA-51</span><span class="seat booked">JHA-52</span>
+<span class="seat booked">JHA-53</span><span class="seat booked">JHA-54</span><span class="aisle"></span><span class="seat booked">JHA-55</span><span class="seat booked">JHA-56</span>
+<span class="seat booked">JHA-57</span><span class="seat booked">JHA-58</span><span class="aisle"></span><span class="seat booked">JHA-59</span><span class="seat booked">JHA-60</span>  </div>
+  <div class="legend">
+    <div><span style="background:#e2f4ea;border:1px solid #2e7d5b"></span>Available</div>
+    <div><span style="background:#dfe3e1"></span>Booked</div>
+    <div><span style="background:#e2f4ea;outline:3px solid #ffd166"></span>Suggested by Ticket Alarm</div>
+  </div>
+  <div class="overlay">
+    <div class="hd"><b style="color:#6fe3a5">🚆 Ticket Alarm</b><span class="stop">■ STOP</span></div>
+    <div class="stage">🪑 Pick the highlighted seats</div>
+    <div class="sub">Suggested: JHA-27, JHA-28 (side by side, middle of coach)
+Coach KHA has more free seats (31)</div>
+    <a>details ▾</a>
+  </div>
+</div>
+</body></html>

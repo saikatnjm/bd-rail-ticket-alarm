@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "BD Rail Ticket Alarm",
+  "short_name": "Ticket Alarm",
+  "version": "1.0.0",
+  "description": "Rings an alarm the second Bangladesh Railway tickets for your train go on sale, then highlights BOOK NOW and good seats.",
+  "homepage_url": "https://saikatnjm.github.io/bd-rail-ticket-alarm/",
+  "permissions": [
+    "alarms",
+    "storage",
+    "notifications",
+    "tabs",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://train.shohoz.com/*",
+    "https://railspaapi.shohoz.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "BD Rail Ticket Alarm",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://train.shohoz.com/*"
+      ],
+      "js": [
+        "rail-data.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

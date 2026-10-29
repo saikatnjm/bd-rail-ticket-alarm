@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy · BD Rail Ticket Alarm</title>
+  <meta name="description" content="Privacy policy for the BD Rail Ticket Alarm browser extension, in English and Bangla.">
+  <link rel="icon" href="img/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="in">
+  <a class="brand" href="index.html"><img src="img/icon128.png" alt="">BD Rail Ticket Alarm</a>
+  <nav>
+    <a href="index.html">Guide</a>
+    <a href="how-it-works.html">How it works</a>
+    <a class="on" href="privacy.html">Privacy</a>
+    <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm">GitHub</a>
+    <a class="lang" href="#bn" lang="bn">বাংলা</a>
+  </nav>
+</div></header>
+
+<main>
+<section id="en">
+  <h2>Privacy Policy</h2>
+  <p><i>Last updated: 30 October 2026</i></p>
+  <p>BD Rail Ticket Alarm (“the extension”) is a free browser extension that alerts you when Bangladesh Railway
+     tickets for your chosen train go on sale on train.shohoz.com. This page explains exactly what data it touches.
+     In short: <b>everything stays in your browser, except the ticket searches it sends to Shohoz's own servers on your behalf.</b></p>
+
+  <h3>What it reads</h3>
+  <ul>
+    <li><b>Your login session on train.shohoz.com</b> — the session token, device ID and device key that the website itself keeps in your browser,
+        and your display name (to show “Logged in as …”). The extension never sees or asks for your password.</li>
+    <li><b>Ticket search results and the page you're on</b> at train.shohoz.com — to find your train, light up the BOOK NOW button and outline free seats.</li>
+  </ul>
+
+  <h3>What it stores (only in your browser)</h3>
+  <ul>
+    <li>Your settings: route, journey date, train, class, seat count, preferred coaches/seats, language.</li>
+    <li>Saved trips you create, the last 10 run results, a cached train list for your routes, and the time it's armed for.</li>
+  </ul>
+  <p>This is kept with <code>chrome.storage.local</code> on your computer. The login session is <b>not</b> copied into it.</p>
+
+  <h3>Where data is sent</h3>
+  <ul>
+    <li><b>Only to Shohoz:</b> <code>train.shohoz.com</code> and <code>railspaapi.shohoz.com</code>, the same servers the website uses.
+        The extension sends train searches with your session, exactly as the website's own Search button does.</li>
+    <li>No analytics, no tracking, no ads, no third-party services, no servers run by the developer.</li>
+  </ul>
+
+  <h3>What it never does</h3>
+  <ul>
+    <li>Never sells, shares or transfers your data to anyone.</li>
+    <li>Never uses your data for anything except the alert feature described here.</li>
+    <li>Never handles your password, OTP or payment details.</li>
+    <li>Never loads code from the internet — all its code ships inside the extension.</li>
+  </ul>
+
+  <h3>Permissions and why</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Permission</th><th>Why</th></tr>
+    <tr><td>Access to train.shohoz.com and railspaapi.shohoz.com</td><td>Search for your train, highlight buttons and seats on the ticket site.</td></tr>
+    <tr><td>alarms</td><td>Start at the exact release time and send reminders.</td></tr>
+    <tr><td>storage</td><td>Remember your settings, saved trips and recent runs.</td></tr>
+    <tr><td>notifications</td><td>Tell you when seats open and remind you before release.</td></tr>
+    <tr><td>tabs</td><td>Open or reuse the ticket site tab at release time.</td></tr>
+    <tr><td>offscreen</td><td>Play the alarm sound (browsers block sound in tabs you haven't clicked).</td></tr>
+  </table></div>
+
+  <h3>Deleting your data</h3>
+  <p>Remove the extension from <code>brave://extensions</code> or <code>chrome://extensions</code>. The browser deletes everything it stored.</p>
+
+  <h3>Changes and contact</h3>
+  <p>Changes to this policy will be posted on this page with a new date.
+     Questions: open an issue at <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/issues">github.com/saikatnjm/bd-rail-ticket-alarm/issues</a>.</p>
+  <p>The extension is not affiliated with Bangladesh Railway or Shohoz.</p>
+</section>
+
+<section id="bn" lang="bn">
+  <h2>প্রাইভেসি নীতি</h2>
+  <p><i>সর্বশেষ আপডেট: ৩০ অক্টোবর ২০২৬</i></p>
+  <p>বিডি রেল টিকিট অ্যালার্ম ("এক্সটেনশন") একটি ফ্রি ব্রাউজার এক্সটেনশন, যা train.shohoz.com-এ আপনার বাছাই করা ট্রেনের
+     টিকিট ছাড়লে আপনাকে জানায়। এটি কোন কোন তথ্য ছোঁয়, এখানে ঠিক তা-ই লেখা।
+     সংক্ষেপে: <b>সবকিছু আপনার ব্রাউজারেই থাকে — শুধু আপনার হয়ে ট্রেন খোঁজার রিকোয়েস্টগুলো শোহজের নিজের সার্ভারে যায়।</b></p>
+
+  <h3>যা পড়ে</h3>
+  <ul>
+    <li><b>train.shohoz.com-এ আপনার লগইন সেশন</b> — সাইট নিজে আপনার ব্রাউজারে যে সেশন টোকেন, ডিভাইস আইডি ও ডিভাইস কী রাখে,
+        আর আপনার নাম ("লগইন করা আছে …" দেখানোর জন্য)। এক্সটেনশন কখনো আপনার পাসওয়ার্ড দেখে না বা চায় না।</li>
+    <li><b>ট্রেন খোঁজার ফলাফল আর আপনি যে পেজে আছেন</b> — আপনার ট্রেন খুঁজতে, BOOK NOW জ্বালাতে আর খালি সিট দাগাতে।</li>
+  </ul>
+
+  <h3>যা জমা রাখে (শুধু আপনার ব্রাউজারে)</h3>
+  <ul>
+    <li>আপনার সেটিংস: রুট, যাত্রার তারিখ, ট্রেন, ক্লাস, সিট সংখ্যা, পছন্দের বগি/সিট, ভাষা।</li>
+    <li>আপনার সেভ করা ট্রিপ, শেষ ১০টি রানের ফলাফল, রুটের ট্রেনের তালিকা, আর কখন ARM করা আছে।</li>
+  </ul>
+  <p>এগুলো আপনার কম্পিউটারে <code>chrome.storage.local</code>-এ থাকে। লগইন সেশন এখানে কপি করা হয় <b>না</b>।</p>
+
+  <h3>তথ্য কোথায় যায়</h3>
+  <ul>
+    <li><b>শুধু শোহজে:</b> <code>train.shohoz.com</code> আর <code>railspaapi.shohoz.com</code> — সাইট নিজে যে সার্ভার ব্যবহার করে।
+        সাইটের নিজের Search বোতামের মতোই আপনার সেশন দিয়ে ট্রেন খোঁজে।</li>
+    <li>কোনো অ্যানালিটিক্স, ট্র্যাকিং, বিজ্ঞাপন বা তৃতীয় পক্ষের সার্ভিস নেই; ডেভেলপারের কোনো সার্ভারও নেই।</li>
+  </ul>
+
+  <h3>যা কখনো করে না</h3>
+  <ul>
+    <li>আপনার তথ্য কখনো বিক্রি, শেয়ার বা কাউকে হস্তান্তর করে না।</li>
+    <li>এখানে লেখা অ্যালার্মের কাজ ছাড়া অন্য কিছুতে ব্যবহার করে না।</li>
+    <li>পাসওয়ার্ড, OTP বা পেমেন্টের তথ্য কখনো ছোঁয় না।</li>
+    <li>ইন্টারনেট থেকে কোনো কোড নামায় না — সব কোড এক্সটেনশনের ভেতরেই।</li>
+  </ul>
+
+  <h3>অনুমতি ও কারণ</h3>
+  <div class="tablewrap"><table>
+    <tr><th>অনুমতি</th><th>কেন</th></tr>
+    <tr><td>train.shohoz.com ও railspaapi.shohoz.com</td><td>ট্রেন খোঁজা, টিকিট সাইটে বোতাম আর সিট দেখিয়ে দেওয়া।</td></tr>
+    <tr><td>alarms</td><td>ঠিক ছাড়ার সময়ে চালু হওয়া আর রিমাইন্ডার পাঠানো।</td></tr>
+    <tr><td>storage</td><td>সেটিংস, সেভ করা ট্রিপ আর আগের রান মনে রাখা।</td></tr>
+    <tr><td>notifications</td><td>সিট খুললে আর ছাড়ার আগে জানানো।</td></tr>
+    <tr><td>tabs</td><td>ছাড়ার সময়ে টিকিট সাইটের ট্যাব খোলা বা আগেরটা ব্যবহার করা।</td></tr>
+    <tr><td>offscreen</td><td>অ্যালার্মের আওয়াজ বাজানো (ক্লিক না করা ট্যাবে ব্রাউজার আওয়াজ আটকে দেয়)।</td></tr>
+  </table></div>
+
+  <h3>তথ্য মুছতে</h3>
+  <p><code>brave://extensions</code> বা <code>chrome://extensions</code> থেকে এক্সটেনশনটি সরিয়ে দিন। ব্রাউজার জমা থাকা সব তথ্য মুছে দেবে।</p>
+
+  <h3>পরিবর্তন ও যোগাযোগ</h3>
+  <p>নীতিতে পরিবর্তন হলে নতুন তারিখসহ এই পেজে দেওয়া হবে।
+     প্রশ্ন থাকলে: <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/issues">github.com/saikatnjm/bd-rail-ticket-alarm/issues</a>-এ issue খুলুন।</p>
+  <p>এক্সটেনশনটি বাংলাদেশ রেলওয়ে বা শোহজের সাথে যুক্ত নয়।</p>
+</section>
+</main>
+
+<footer><div class="in">
+  BD Rail Ticket Alarm · <a href="index.html">Guide</a> · <a href="bn.html" lang="bn">বাংলা গাইড</a>
+</div></footer>
+</body>
+</html>
