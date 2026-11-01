@@ -62,20 +62,30 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
 
 <section id="install">
   <h2>Install</h2>
-  <h3>Option A — Chrome Web Store (easiest)</h3>
-  <p>Open the store link and press <b>Add to Chrome</b> (works in Brave too). Updates install automatically.</p>
-  <div class="note">The store link is shared privately (the listing is <i>unlisted</i>). If you don't have it, use option B.</div>
-
-  <h3>Option B — from GitHub</h3>
+  <p>It takes about two minutes. You install it straight from GitHub using the browser's <i>Developer mode</i> —
+     that's normal for extensions that aren't in the Web Store, and nothing is sent anywhere.</p>
   <ol class="steps">
-    <li>Download the latest zip from the <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/releases">Releases page</a> and unzip it.
-        (Or press <b>Code → Download ZIP</b> on the GitHub page and use the <code>shohoz-autobook</code> folder inside.)</li>
-    <li>Open <code>brave://extensions</code> (or <code>chrome://extensions</code>).</li>
-    <li>Turn on <b>Developer mode</b> (top-right switch).</li>
-    <li>Press <b>Load unpacked</b> and choose the unzipped folder (the one that has <code>manifest.json</code> in it).</li>
-    <li>Pin the 🔔 icon to the toolbar. Click it to open the panel.</li>
+    <li><b>Download</b> <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/archive/refs/heads/main.zip">bd-rail-ticket-alarm-main.zip</a> and unzip it
+        (right-click → <i>Extract here</i>). Put the folder somewhere permanent, like <code>Documents</code>.</li>
+    <li>Open <code>brave://extensions</code> in Brave, or <code>chrome://extensions</code> in Chrome.</li>
+    <li>Turn on <b>Developer mode</b> (switch at the top-right).</li>
+    <li>Press <b>Load unpacked</b> and choose the <code>shohoz-autobook</code> folder inside
+        <code>bd-rail-ticket-alarm-main</code> — it's the one with <code>manifest.json</code> in it.</li>
+    <li>Click the puzzle-piece icon in the toolbar and pin <b>BD Rail Ticket Alarm</b>. Click the 🔔 to open the panel.</li>
   </ol>
-  <div class="note">Keep that folder where it is. If you move or delete it, the browser removes the extension and its settings.</div>
+  <div class="note">Keep that folder where it is. If you move, rename or delete it, the browser drops the extension and its settings.
+    Brave/Chrome may show a “developer mode extensions” notice on start-up — that's expected; press the X.</div>
+
+  <h3>Updating to a new version</h3>
+  <ol class="steps">
+    <li>Download the zip again and unzip it.</li>
+    <li>Copy the new files <b>over</b> the old <code>shohoz-autobook</code> folder (same place, replace all).</li>
+    <li>At <code>brave://extensions</code>, press ↻ on the extension's card. Your settings and saved trips stay.</li>
+  </ol>
+  <p>Re-check that <b>ARM</b> is still red after updating — reloading can clear a pending alarm.</p>
+
+  <h3>Chrome Web Store</h3>
+  <p>A Web Store version (with automatic updates) is planned but not available yet. Until then, use the steps above.</p>
 </section>
 
 <section id="use">

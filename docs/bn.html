@@ -62,20 +62,30 @@
 
 <section id="install">
   <h2>ইনস্টল</h2>
-  <h3>উপায় ক — Chrome Web Store (সবচেয়ে সহজ)</h3>
-  <p>স্টোরের লিংক খুলে <b>Add to Chrome</b> চাপুন (Brave-এও কাজ করে)। আপডেট নিজে থেকেই আসবে।</p>
-  <div class="note">স্টোরের লিংকটি ব্যক্তিগতভাবে শেয়ার করা হয় (লিস্টিং <i>unlisted</i>)। লিংক না থাকলে উপায় খ ব্যবহার করুন।</div>
-
-  <h3>উপায় খ — GitHub থেকে</h3>
+  <p>প্রায় দুই মিনিট লাগে। ব্রাউজারের <i>Developer mode</i> দিয়ে সরাসরি GitHub থেকে ইনস্টল করবেন —
+     ওয়েব স্টোরে না থাকা এক্সটেনশনের জন্য এটাই স্বাভাবিক নিয়ম, এতে কোনো তথ্য কোথাও যায় না।</p>
   <ol class="steps">
-    <li><a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/releases">Releases পেজ</a> থেকে সর্বশেষ zip নামিয়ে আনজিপ করুন।
-        (অথবা GitHub পেজে <b>Code → Download ZIP</b> চেপে ভেতরের <code>shohoz-autobook</code> ফোল্ডারটি নিন।)</li>
-    <li><code>brave://extensions</code> (বা <code>chrome://extensions</code>) খুলুন।</li>
+    <li><a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/archive/refs/heads/main.zip">bd-rail-ticket-alarm-main.zip</a> <b>ডাউনলোড</b> করে আনজিপ করুন
+        (রাইট-ক্লিক → <i>Extract here</i>)। ফোল্ডারটি স্থায়ী কোনো জায়গায় রাখুন, যেমন <code>Documents</code>।</li>
+    <li>Brave-এ <code>brave://extensions</code>, বা Chrome-এ <code>chrome://extensions</code> খুলুন।</li>
     <li>ডানদিকে উপরে <b>Developer mode</b> চালু করুন।</li>
-    <li><b>Load unpacked</b> চেপে আনজিপ করা ফোল্ডারটি বাছুন (যেটার ভেতরে <code>manifest.json</code> আছে)।</li>
-    <li>🔔 আইকনটি টুলবারে পিন করুন। ক্লিক করলে প্যানেল খুলবে।</li>
+    <li><b>Load unpacked</b> চেপে <code>bd-rail-ticket-alarm-main</code>-এর ভেতরের <code>shohoz-autobook</code> ফোল্ডারটি বাছুন —
+        যেটার ভেতরে <code>manifest.json</code> আছে।</li>
+    <li>টুলবারের পাজল-আইকনে ক্লিক করে <b>BD Rail Ticket Alarm</b> পিন করুন। 🔔 চাপলে প্যানেল খুলবে।</li>
   </ol>
-  <div class="note">ফোল্ডারটি জায়গামতো রেখে দিন। সরালে বা মুছলে ব্রাউজার এক্সটেনশন আর তার সেটিংস মুছে দেবে।</div>
+  <div class="note">ফোল্ডারটি জায়গামতো রেখে দিন। সরালে, নাম বদলালে বা মুছলে ব্রাউজার এক্সটেনশন আর তার সেটিংস হারিয়ে ফেলবে।
+    চালু করার সময় Brave/Chrome "developer mode extensions" নিয়ে একটা নোটিশ দেখাতে পারে — এটা স্বাভাবিক, X চাপুন।</div>
+
+  <h3>নতুন ভার্সনে আপডেট</h3>
+  <ol class="steps">
+    <li>zip আবার ডাউনলোড করে আনজিপ করুন।</li>
+    <li>নতুন ফাইলগুলো পুরনো <code>shohoz-autobook</code> ফোল্ডারের <b>ওপরে</b> কপি করুন (একই জায়গায়, সব রিপ্লেস)।</li>
+    <li><code>brave://extensions</code>-এ এক্সটেনশনের কার্ডে ↻ চাপুন। সেটিংস আর সেভ করা ট্রিপ থেকে যাবে।</li>
+  </ol>
+  <p>আপডেটের পর <b>ARM</b> এখনো লাল আছে কি না দেখে নিন — রিলোডে চালু থাকা অ্যালার্ম মুছে যেতে পারে।</p>
+
+  <h3>Chrome Web Store</h3>
+  <p>ওয়েব স্টোর ভার্সন (নিজে থেকে আপডেট হবে) পরিকল্পনায় আছে, এখনো আসেনি। ততদিন উপরের নিয়মে ইনস্টল করুন।</p>
 </section>
 
 <section id="use">
