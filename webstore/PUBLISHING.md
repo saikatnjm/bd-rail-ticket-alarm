@@ -31,11 +31,11 @@ Everything below is already prepared in this folder:
 The local repository is already committed. In a terminal, run these two commands (your SSH key for GitHub already works on this computer):
 
 ```bash
-cd "/run/media/saikat/Software (SSD)/claude/saikat/chrome_extension" && git remote add origin git@github.com:saikatnjm/bd-rail-ticket-alarm.git
+cd "/run/media/saikat/Software (SSD)/claude/saikat/bd_train_chrome_extension" && git remote add origin git@github.com:saikatnjm/bd-rail-ticket-alarm.git
 ```
 
 ```bash
-cd "/run/media/saikat/Software (SSD)/claude/saikat/chrome_extension" && git push -u origin main
+cd "/run/media/saikat/Software (SSD)/claude/saikat/bd_train_chrome_extension" && git push -u origin main
 ```
 
 ### 3. Turn on GitHub Pages (the documentation website)
@@ -65,7 +65,7 @@ cd "/run/media/saikat/Software (SSD)/claude/saikat/chrome_extension" && git push
 ### 1. Build the zip
 
 ```bash
-cd "/run/media/saikat/Software (SSD)/claude/saikat/chrome_extension" && ./build-zip.sh
+cd "/run/media/saikat/Software (SSD)/claude/saikat/bd_train_chrome_extension" && ./build-zip.sh
 ```
 
 It creates `webstore/bd-rail-ticket-alarm-<version>.zip` with only the extension files.
