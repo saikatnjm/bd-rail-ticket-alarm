@@ -34,7 +34,7 @@
 <main>
 
 <div class="warn"><b>Not official.</b> This is a free, personal project. It is not made by, approved by, or connected to
-Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (train.shohoz.com) on time.</div>
+Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (eticket.railway.gov.bd) on time.</div>
 
 <section id="what">
   <h2>What it does</h2>
@@ -55,7 +55,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
   <h2>What you need</h2>
   <ul>
     <li>A computer with <b>Brave</b> or <b>Google Chrome</b> (or another Chromium browser like Edge). Phones are not supported.</li>
-    <li>An account on <a href="https://train.shohoz.com">train.shohoz.com</a>, logged in on that browser.</li>
+    <li>An account on <a href="https://eticket.railway.gov.bd">eticket.railway.gov.bd</a>, logged in on that browser.</li>
     <li>The browser open and the computer awake at release time — the extension can't wake a sleeping computer.</li>
   </ul>
 </section>
@@ -93,7 +93,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
   <p>The panel has five numbered steps. A finished step folds to one line with a ✓ — tap it to open it again.
      The <b>বাং</b> button at the top switches the whole panel to Bangla.</p>
   <ol class="steps">
-    <li><b>Log in.</b> Press <b>🌐 Open site</b> at the top of the panel — it opens train.shohoz.com for you (or jumps to the tab if it's already open). Log in there. The panel shows a green ✓ when it sees you're logged in. (You always log in yourself — the extension never asks for your password.)</li>
+    <li><b>Log in.</b> Press <b>🌐 Open site</b> at the top of the panel — it opens eticket.railway.gov.bd for you (or jumps to the tab if it's already open). Log in there, and press <b>I AGREE</b> on the site's disclaimer banner once so it doesn't cover the page at release time. The panel shows a green ✓ when it sees you're logged in. (You always log in yourself — the extension never asks for your password.)</li>
     <li><b>Route.</b> Type the From and To stations and pick them from the suggestions.</li>
     <li><b>Date.</b> Tap your travel date. The line underneath says when those tickets go on sale.</li>
     <li><b>Train.</b> Press <b>⟳ Load trains</b> and pick yours. The list shows departure → arrival times. The check times are set for you: 12 AM on the opening day, then the train's zone time (WEST 8 AM, EAST 2 PM).</li>
@@ -109,7 +109,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
     <tr><th>When</th><th>What happens</th></tr>
     <tr><td>1 day before</td><td>Reminder notification: “Tickets open tomorrow”.</td></tr>
     <tr><td>1 hour before</td><td>Reminder notification. Check you're logged in.</td></tr>
-    <tr><td>~75 seconds before</td><td>A train.shohoz.com tab opens with a small status box at the bottom-right.</td></tr>
+    <tr><td>~75 seconds before</td><td>A eticket.railway.gov.bd tab opens with a small status box at the bottom-right.</td></tr>
     <tr><td>12:00 AM on the opening day</td><td>It starts checking for your train, about once a second, for up to 5 minutes.</td></tr>
     <tr><td>Zone time (8 AM / 2 PM)</td><td>Only if the 12 AM check found nothing: the same check runs again. If seats were found at 12 AM, this is cancelled.</td></tr>
     <tr><td>Seats appear</td><td>🔔 Alarm + notification. The page reloads, scrolls to your train, and your class's BOOK NOW glows.</td></tr>
@@ -167,9 +167,9 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
   <div class="tablewrap"><table>
     <tr><th>Problem</th><th>What to do</th></tr>
     <tr><td>“You are requesting too frequently”</td><td>Press ■ STOP, close the tab, wait 15–30 minutes.</td></tr>
-    <tr><td>Red ✖ not logged in</td><td>Log in at train.shohoz.com, then press ↻ re-check.</td></tr>
+    <tr><td>Red ✖ not logged in</td><td>Log in at eticket.railway.gov.bd, then press ↻ re-check. If you used train.shohoz.com before: logins don't carry over between the two sites, so log in once on eticket.railway.gov.bd.</td></tr>
     <tr><td>“Session expired” in the status box</td><td>Log in again. The alarm rings so you notice.</td></tr>
-    <tr><td>No trains in the list</td><td>Open train.shohoz.com in a tab, log in, then press ⟳ Load trains.</td></tr>
+    <tr><td>No trains in the list</td><td>Open eticket.railway.gov.bd in a tab, log in, then press ⟳ Load trains.</td></tr>
     <tr><td>No sound</td><td>Tools → 🔔 Test alarm sound. Check the computer volume and that the browser isn't muted.</td></tr>
     <tr><td>No notifications</td><td>Allow notifications for the browser in your computer's settings, and turn off Do Not Disturb.</td></tr>
     <tr><td>Changed train or date after arming</td><td>Press ARM to cancel, then ARM again.</td></tr>

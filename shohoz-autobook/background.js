@@ -109,7 +109,7 @@ function searchUrl(cfg, doj) {
     doj,
     class: (cfg.classPriority.split(",")[0] || "S_CHAIR").trim(),
   });
-  return `https://train.shohoz.com/booking/train/search?${q.toString()}`;
+  return `https://eticket.railway.gov.bd/booking/train/search?${q.toString()}`;
 }
 
 async function arm() {
@@ -180,8 +180,8 @@ async function launchMission(runAt, { nextAt = null, scheduled = false } = {}) {
   };
   await chrome.storage.local.set({ mission });
 
-  // Reuse an existing shohoz tab if there is one, else open a new one.
-  const tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  // Reuse an existing railway site tab if there is one, else open a new one.
+  const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   if (tabs.length > 0) {
     await chrome.tabs.update(tabs[0].id, { url, active: true });
     await chrome.windows.update(tabs[0].windowId, { focused: true });
@@ -223,12 +223,12 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 async function openSite() {
-  const tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   if (tabs.length > 0) {
     await chrome.tabs.update(tabs[0].id, { active: true });
     await chrome.windows.update(tabs[0].windowId, { focused: true });
   } else {
-    await chrome.tabs.create({ url: "https://train.shohoz.com/", active: true });
+    await chrome.tabs.create({ url: "https://eticket.railway.gov.bd/", active: true });
   }
 }
 

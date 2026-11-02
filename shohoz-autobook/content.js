@@ -1,5 +1,5 @@
 // BD Rail Ticket Alarm — content script (booking assistant).
-// Runs on train.shohoz.com with the user's own logged-in session.
+// Runs on eticket.railway.gov.bd with the user's own logged-in session.
 // At release time it searches for the chosen train, and as soon as online
 // seats exist it reloads the site's own results page, highlights the train's
 // BOOK NOW button and rings the alarm. The user opens the seat map, picks
@@ -395,10 +395,10 @@
     if (!authHeaders()) {
       setStage("fail");
       recordRun("not_logged_in");
-      err(tx("Not logged in! Log in to train.shohoz.com first, then re-arm.",
-             "লগইন নেই! আগে train.shohoz.com-এ লগইন করুন, তারপর আবার ARM করুন।"));
+      err(tx("Not logged in! Log in to eticket.railway.gov.bd first, then re-arm.",
+             "লগইন নেই! আগে eticket.railway.gov.bd-এ লগইন করুন, তারপর আবার ARM করুন।"));
       notify(tx("Ticket Alarm: NOT LOGGED IN", "টিকিট অ্যালার্ম: লগইন নেই"),
-             tx("Log in to train.shohoz.com and re-arm.", "train.shohoz.com-এ লগইন করে আবার ARM করুন।"));
+             tx("Log in to eticket.railway.gov.bd and re-arm.", "eticket.railway.gov.bd-এ লগইন করে আবার ARM করুন।"));
       sirenOn();
       return;
     }
@@ -485,7 +485,7 @@
           setStage("fail");
           recordRun("expired");
           err("Session expired (401). Log in again!");
-          notify("Ticket Alarm: session expired", "Log in to train.shohoz.com again.");
+          notify("Ticket Alarm: session expired", "Log in to eticket.railway.gov.bd again.");
           sirenOn();
           return;
         } else if (status === 429) {
@@ -547,7 +547,7 @@
     });
     chrome.runtime.sendMessage({ type: "found", scheduled: !!mission.scheduled }).catch(() => {});
     location.href =
-      "https://train.shohoz.com/booking/train/search?" +
+      "https://eticket.railway.gov.bd/booking/train/search?" +
       new URLSearchParams({ fromcity: cfg.fromCity, tocity: cfg.toCity, doj, class: seatType.type }).toString();
   }
 

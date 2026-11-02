@@ -37,7 +37,7 @@
     <tr><th>File</th><th>Runs where</th><th>Job</th></tr>
     <tr><td><code>popup.html</code> / <code>popup.js</code></td><td>The toolbar panel</td><td>Calendar, route/train/seat form, ARM, countdown, saved trips, history, English/Bangla.</td></tr>
     <tr><td><code>background.js</code></td><td>Service worker</td><td>Works out the release time, sets <code>chrome.alarms</code> (main + 1-day + 1-hour reminders), opens the site tab ~75 s early, shows notifications, starts/stops the alarm sound.</td></tr>
-    <tr><td><code>content.js</code></td><td>Inside train.shohoz.com</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining.</td></tr>
+    <tr><td><code>content.js</code></td><td>Inside eticket.railway.gov.bd</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining.</td></tr>
     <tr><td><code>offscreen.html</code> / <code>offscreen.js</code></td><td>Hidden extension page</td><td>Plays the siren (Web Audio oscillator).</td></tr>
     <tr><td><code>rail-data.js</code></td><td>Popup, worker, page</td><td>Bundled station list, train names, and each train's release time and zone (EAST 2 PM / WEST 8 AM).</td></tr>
     <tr><td><code>i18n.js</code></td><td>Popup</td><td>English and Bangla text.</td></tr>
@@ -52,7 +52,7 @@
      sets alarms at  T−24h (reminder) · T−1h (reminder) · T−75s (launch), T = check 1
      check 1 fires → check 2's alarm is set; seats found → check 2 is cancelled
 
-T−75s   background opens (or reuses) a train.shohoz.com tab and saves a "mission"
+T−75s   background opens (or reuses) a eticket.railway.gov.bd tab and saves a "mission"
         content.js picks up the mission:
           1. logged in?            no  → alarm + notification, stop
           2. date released inside this run's window?  no → stop (don't search for nothing)
@@ -80,7 +80,7 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
   <p>You log in on the website as usual. The website keeps your session in the page's <code>localStorage</code>
      (a token plus a device ID and key). The watcher reads those and sends them with its searches as the same
      headers the website itself uses (<code>Authorization</code>, <code>X-Device-Id</code>, <code>X-Device-Key</code>).
-     They are only ever sent to Shohoz's own API, never stored by the extension and never sent anywhere else.
+     They are only ever sent to the railway's own ticketing API (the one eticket.railway.gov.bd uses), never stored by the extension and never sent anywhere else.
      Your password is never seen.</p>
 </section>
 
@@ -130,7 +130,7 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
     <tr><td>STOP button everywhere</td><td>Panel and on-page status box both abort immediately.</td><td><code>stopRun</code></td></tr>
   </table></div>
   <p>Your side of it: don't test repeatedly on dates that aren't on sale, don't arm two computers for the same trip,
-     and don't open many shohoz tabs during a run.</p>
+     and don't open many ticket-site tabs during a run.</p>
 </section>
 
 <section id="limits">
@@ -158,11 +158,11 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
   <h2>Drawbacks and risks</h2>
   <ul>
     <li><b>No guarantee against blocks.</b> One search a second for a few minutes is faster than most people click.
-        If Shohoz tightens its limits you can still get a temporary “requesting too frequently” block.
+        If the railway's system tightens its limits you can still get a temporary “requesting too frequently” block.
         Account action is unlikely at this volume, but nobody can promise it.</li>
-    <li><b>It's visible.</b> As described above, the pattern is recognisable. If Shohoz decides to block tools like this,
+    <li><b>It's visible.</b> As described above, the pattern is recognisable. If the railway decides to block tools like this,
         it will stop working, and there's no plan to fight that.</li>
-    <li><b>Session access.</b> Like any extension that can read the site, it can see your login session. This one only sends it to Shohoz.
+    <li><b>Session access.</b> Like any extension that can read the site, it can see your login session. This one only sends it to the railway's ticketing servers.
         The code is short and open — read it before installing.</li>
     <li><b>Rules.</b> Check the ticket website's terms yourself. This is meant for buying your own tickets, not reselling.</li>
     <li><b>Fairness at scale.</b> If everyone ran it, nobody would have an edge and the server would get busier.
@@ -175,7 +175,7 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
   <ol class="steps">
     <li>Clone the repo. The extension is in the <code>shohoz-autobook/</code> folder.</li>
     <li><code>brave://extensions</code> → Developer mode → <b>Load unpacked</b> → choose that folder.</li>
-    <li>After editing, press ↻ on the extension card and reload the shohoz tab.</li>
+    <li>After editing, press ↻ on the extension card and reload the ticket-site tab.</li>
     <li>Test on a date that's <b>already on sale</b> with <b>▶ Test run now</b>. Open the status box's <i>details ▾</i> for the log.</li>
   </ol>
   <h3>Useful constants</h3>

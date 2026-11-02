@@ -1,23 +1,25 @@
 // Fake extension APIs so popup.html can render outside the browser for store screenshots.
 (function () {
   const q = new URLSearchParams(location.search);
-  let rel = new Date(2026, 9, 31, 14, 0, 0).getTime();
-  if (rel < Date.now()) rel = Date.now() + (13 * 3600 + 44 * 60 + 12) * 1000;
+  let rel = new Date(2026, 10, 3, 0, 0, 0).getTime();
+  if (rel < Date.now()) rel = Date.now() + (1 * 3600 + 54 * 60 + 12) * 1000;
+  const rel2 = new Date(rel); rel2.setHours(14, 0, 0, 0);
   const store = {
     config: {
       fromCity: "Dhaka", toCity: "Chattogram", trainQuery: "SUBORNO EXPRESS (702)",
       classPriority: "S_CHAIR", seatCount: 2, preferredCoaches: "", preferredSeats: "",
-      journeyDate: "2026-11-10", triggerTime: "auto", pollIntervalMs: 700, maxWaitMinutes: 5,
+      journeyDate: "2026-11-13", triggerTime: "auto", pollIntervalMs: 700, maxWaitMinutes: 5,
       autoReleaseTime: true, lang: q.get("lang") === "bn" ? "bn" : "en",
     },
     armedTrigger: q.get("armed") === "0" ? null : rel,
+    armedStages: q.get("armed") === "0" ? null : [rel, rel2.getTime()],
     trainCache: { "Dhaka|Chattogram": { at: Date.now(), trains: [
       { name: "SUBORNO EXPRESS (702)", departure: "04:30 PM", arrival: "09:10 PM" },
       { name: "SONAR BANGLA EXPRESS (787)", departure: "07:00 AM", arrival: "12:10 PM" },
       { name: "TURNA (741)", departure: "11:30 PM", arrival: "06:30 AM" },
     ] } },
     runHistory: [
-      { at: Date.now() - 86400000, doj: "2026-11-09", train: "SUBORNO (702)", outcome: "found", detail: "" },
+      { at: Date.now() - 86400000, doj: "2026-11-12", train: "SUBORNO (702)", outcome: "found", detail: "" },
     ],
     presets: { "Dhaka → Ctg (Suborno)": {} },
   };

@@ -309,7 +309,7 @@ async function loadCachedTrains() {
 async function loadTrains() {
   await saveConfig();
   setStatus(t("loadingTrains"));
-  const tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   if (tabs.length === 0) { setStatus(t("loginThenRetry")); return; }
   const today = day0(new Date());
   const dates = [];
@@ -465,17 +465,17 @@ async function askTab(tabId) {
 async function checkLogin(openIfMissing) {
   loginView = { code: "checking", user: null };
   renderLogin();
-  let tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  let tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   if (tabs.length === 0) {
     if (!openIfMissing) {
       loginView = { code: "noTab", user: null };
       renderLogin();
       return;
     }
-    await chrome.tabs.create({ url: "https://train.shohoz.com/", active: false });
+    await chrome.tabs.create({ url: "https://eticket.railway.gov.bd/", active: false });
     for (let i = 0; i < 20; i++) {
       await new Promise((r) => setTimeout(r, 500));
-      tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+      tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
       if (tabs.length) {
         const res = await askTab(tabs[0].id);
         if (res) return applyLogin(res);
@@ -544,7 +544,7 @@ $("checkSeats").onclick = async () => {
   const jd = $("journeyDate").value;
   if (!jd) { setStatus(t("pickDateFirst")); return; }
   setStatus(t("checkingSeats"));
-  const tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   if (tabs.length === 0) { setStatus(t("loginThenRetry")); return; }
   const EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const d = fromIso(jd);
@@ -617,7 +617,7 @@ $("openTab").onclick = () => {
 if (new URLSearchParams(location.search).get("tab")) $("openTab").style.display = "none";
 
 $("stopRun").onclick = async () => {
-  const tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   await chrome.storage.local.set({ mission: null });
   let stopped = 0;
   for (const x of tabs) {

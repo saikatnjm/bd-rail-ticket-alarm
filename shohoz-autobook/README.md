@@ -3,7 +3,7 @@
 **বাংলায় পড়ুন → [README.bn.md](README.bn.md)** · Full guide: https://saikatnjm.github.io/bd-rail-ticket-alarm/
 
 A Brave/Chrome extension that helps you grab Bangladesh Railway tickets
-(train.shohoz.com) the moment they go on sale. You pick the journey date on a
+(eticket.railway.gov.bd) the moment they go on sale. You pick the journey date on a
 calendar; the extension works out **when** those tickets open, watches for your
 train at that exact second, then **rings an alarm and lights up the BOOK NOW
 button** on the site. You click it, pick the seats it outlines for you, and do
@@ -62,7 +62,7 @@ open and the computer awake at release time.
 
 ### What happens at release time
 
-1. ~75 seconds before, a shohoz tab opens with a small status box (bottom-right).
+1. ~75 seconds before, an eticket.railway.gov.bd tab opens with a small status box (bottom-right).
 2. At 12 AM on the opening day it checks for your train, about once a second.
    If nothing opens, it checks again at the zone time (8 AM / 2 PM).
 3. As soon as your class has online seats:
@@ -122,7 +122,7 @@ Your part:
 | Problem | What to do |
 |---|---|
 | "You are requesting too frequently" | Press ■ STOP, close the tab, wait 15–30 minutes |
-| Red ✖ not logged in | Log in at train.shohoz.com, then press ↻ re-check |
+| Red ✖ not logged in | Log in at eticket.railway.gov.bd, then press ↻ re-check |
 | "Session expired" in the status box | Log in again |
 | No trains in the list | Open shohoz in a tab, log in, then ⟳ Load trains |
 | No sound | Press Tools → 🔔 Test alarm sound; check the computer's volume |

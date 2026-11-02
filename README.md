@@ -1,7 +1,7 @@
 # 🔔 BD Rail Ticket Alarm
 
 **Never miss the 10-day ticket release again.** A free Brave/Chrome extension that watches for your
-Bangladesh Railway train the second its tickets go on sale on train.shohoz.com, rings a loud alarm,
+Bangladesh Railway train the second its tickets go on sale on eticket.railway.gov.bd, rings a loud alarm,
 and lights up the BOOK NOW button and good seats. You click, you pay — nothing is booked behind your back.
 
 📖 **Guide:** [English](https://saikatnjm.github.io/bd-rail-ticket-alarm/) · [বাংলা](https://saikatnjm.github.io/bd-rail-ticket-alarm/bn.html)

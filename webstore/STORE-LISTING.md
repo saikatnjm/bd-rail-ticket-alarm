@@ -27,7 +27,7 @@ Rings an alarm the second Bangladesh Railway tickets for your train go on sale, 
 ```
 Never miss the 10-day ticket release again.
 
-BD Rail Ticket Alarm watches for your train on train.shohoz.com at the exact second its tickets go on sale. When your class has online seats, it rings a loud alarm, jumps to your train and makes the BOOK NOW button glow. In the seat map it outlines good seats for you. You click, you pay — nothing is booked behind your back.
+BD Rail Ticket Alarm watches for your train on eticket.railway.gov.bd at the exact second its tickets go on sale. When your class has online seats, it rings a loud alarm, jumps to your train and makes the BOOK NOW button glow. In the seat map it outlines good seats for you. You click, you pay — nothing is booked behind your back.
 
 WHAT IT DOES
 • Pick your travel date on a calendar — it works out the opening day (10 days before) and checks at 12 AM, then again at the train's zone time (8 AM or 2 PM) if needed
@@ -48,7 +48,7 @@ GENTLE ON THE SERVER
 • Never touches the site's bot check, never logs in for you, never handles OTP or payment
 
 HOW TO USE
-1. Log in at train.shohoz.com
+1. Log in at eticket.railway.gov.bd
 2. Open the extension, choose From / To stations
 3. Tap your journey date
 4. Load trains and pick yours
@@ -58,7 +58,7 @@ HOW TO USE
 Tip: try "Test run now" on a date that's already on sale to see the alarm and the glowing button before the real day.
 
 PRIVACY
-Everything stays in your browser. The only data sent anywhere is the train searches it makes to Shohoz's own servers with your existing login, just like the website's own Search button. No analytics, no tracking, no third parties. Full policy: https://saikatnjm.github.io/bd-rail-ticket-alarm/privacy.html
+Everything stays in your browser. The only data sent anywhere is the train searches it makes to the railway's own ticketing servers with your existing login, just like the website's own Search button. No analytics, no tracking, no third parties. Full policy: https://saikatnjm.github.io/bd-rail-ticket-alarm/privacy.html
 
 Full guide (English and Bangla): https://saikatnjm.github.io/bd-rail-ticket-alarm/
 Source code: https://github.com/saikatnjm/bd-rail-ticket-alarm
@@ -106,7 +106,7 @@ https://github.com/saikatnjm/bd-rail-ticket-alarm/issues
 
 **Single purpose description**
 ```
-Alerts the user the moment Bangladesh Railway tickets for their chosen train go on sale on train.shohoz.com, then highlights the site's BOOK NOW button and suggested seats so the user can book them manually.
+Alerts the user the moment Bangladesh Railway tickets for their chosen train go on sale on eticket.railway.gov.bd, then highlights the site's BOOK NOW button and suggested seats so the user can book them manually.
 ```
 
 **Permission justifications**
@@ -128,7 +128,7 @@ Tells the user when seats for their train open, when their login has expired, an
 
 `tabs`
 ```
-Opens (or reuses) the train.shohoz.com tab shortly before the release time so the check runs on the ticket site and the user lands on the right page.
+Opens (or reuses) the eticket.railway.gov.bd tab shortly before the release time so the check runs on the ticket site and the user lands on the right page.
 ```
 
 `offscreen`
@@ -136,7 +136,7 @@ Opens (or reuses) the train.shohoz.com tab shortly before the release time so th
 Plays the alarm sound. Browsers block audio in tabs the user hasn't clicked, and the ticket tab is opened automatically at release time, so the sound plays from an offscreen document.
 ```
 
-Host permissions (`https://train.shohoz.com/*`, `https://railspaapi.shohoz.com/*`)
+Host permissions (`https://eticket.railway.gov.bd/*`, `https://railspaapi.shohoz.com/*`)
 ```
 The extension only works on the Bangladesh Railway ticket site. It checks train availability through the site's own search API using the user's existing login, highlights the BOOK NOW button and outlines suggested seats on the site's pages. No other sites are accessed.
 ```
@@ -147,7 +147,7 @@ No, I am not using remote code.
 ```
 
 **Data usage — what user data do you collect?** Tick only:
-- ☑ **Authentication information** — the site's own login token is read from the page and sent only to train.shohoz.com's API to search for trains.
+- ☑ **Authentication information** — the site's own login token is read from the page and sent only to eticket.railway.gov.bd's API to search for trains.
 - ☑ **Website content** — train search results and seat-map page content are read to find seats and highlight them.
 
 Leave everything else unticked (no personally identifiable info, health, financial, location, web history, user activity, personal communications).
@@ -175,7 +175,7 @@ https://saikatnjm.github.io/bd-rail-ticket-alarm/privacy.html
 ## Test instructions tab (optional but helps review)
 
 ```
-The extension needs a train.shohoz.com account to search trains (Bangladesh phone number required), so a reviewer may not be able to log in. Without login the panel shows that you're not logged in, and a run stops with a "Not logged in" message — that is expected.
+The extension needs a eticket.railway.gov.bd account to search trains (Bangladesh phone number required), so a reviewer may not be able to log in. Without login the panel shows that you're not logged in, and a run stops with a "Not logged in" message — that is expected.
 
 What you can check without an account:
 1. Open the panel, type "Dhaka" and "Chattogram" as From/To, tap a date: it shows when that date's tickets go on sale.
