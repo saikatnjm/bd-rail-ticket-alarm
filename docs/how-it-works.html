@@ -47,8 +47,10 @@
 <section>
   <h2>Timeline of one run</h2>
 <pre><code>ARM pressed (popup)
-  └─ background: release time = journey date − 10 days, at 8 AM or 2 PM (from the train's zone)
-     sets alarms at  T−24h (reminder) · T−1h (reminder) · T−75s (launch)
+  └─ background: opening day = journey date − 10 days
+     check 1 = 12:00 AM that day · check 2 = the train's zone time (EAST 2 PM / WEST 8 AM)
+     sets alarms at  T−24h (reminder) · T−1h (reminder) · T−75s (launch), T = check 1
+     check 1 fires → check 2's alarm is set; seats found → check 2 is cancelled
 
 T−75s   background opens (or reuses) a train.shohoz.com tab and saves a "mission"
         content.js picks up the mission:
@@ -139,8 +141,10 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
     <li><b>It relies on an undocumented website.</b> The search API's response shape and the page's CSS classes
         (<code>.book-now-btn</code>, <code>.btn-seat</code>, <code>seat-available</code>…) can change at any time.
         If they do, the glow or the seat outlines quietly stop working. Do a <i>Test run now</i> before an important trip.</li>
-    <li><b>Release times are a bundled table.</b> If the railway changes a train's zone or opening hour,
-        <code>rail-data.js</code> needs an update — or override it under <i>Advanced</i>.</li>
+    <li><b>The release time isn't certain.</b> The railway's own data (<code>/all-trains/info</code>) gives EAST 2 PM / WEST 8 AM,
+        but new dates have been seen opening at midnight on ordinary days (the site rolls its bookable dates over at
+        <code>update_counter_on = 00:00:00</code>). That's why <i>Auto</i> checks at both times. Zones are a bundled table in
+        <code>rail-data.js</code> — if they change, update it or set a fixed time under <i>Advanced</i>.</li>
     <li><b>The computer has to be on.</b> A sleeping laptop or a closed browser means the alarm fires late or not at all.</li>
     <li><b>One trip per ARM.</b> One route, date and train. The search asks for your first class; the others in your list are picked from the same results.</li>
     <li><b>Online seats only.</b> The site's numbers mix counter and online quotas; only online seats count.</li>

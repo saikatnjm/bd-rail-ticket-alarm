@@ -15,7 +15,7 @@ OTP and payment.
 
 ## Everything it does
 
-- **Calendar date picking** — tap your travel date; it works out when those tickets open (10 days before, 8 AM or 2 PM depending on the train)
+- **Calendar date picking** — tap your travel date; it works out the opening day (10 days before) and checks at 12 AM, then at the train's zone time (8 AM or 2 PM) if needed)
 - **Watches at the exact second** tickets open, synced to the railway server's clock
 - **Rings a loud alarm** when your train has seats — keeps ringing until you click the page
 - **Lights up BOOK NOW** — scrolls to your train and makes its button glow
@@ -51,8 +51,8 @@ tap it to open it again.
 
 1. **Route** — type and pick From / To stations from the suggestions.
 2. **Date** — tap your travel date. The line below tells you when it goes on sale.
-3. **Train** — press **⟳ Load trains**, pick your train. The release time is
-   set for you (WEST zone 8 AM, EAST zone 2 PM).
+3. **Train** — press **⟳ Load trains**, pick your train. The check times are
+   set for you: 12 AM on the opening day, then the zone time (WEST 8 AM, EAST 2 PM).
 4. **Seats & class** — class (e.g. `S_CHAIR`), how many seats, and optionally
    preferred coaches (`THA,TA`) or exact seats (`THA-21,THA-22`).
 5. **Go** — press **ARM**. A green card shows the countdown.
@@ -63,7 +63,8 @@ open and the computer awake at release time.
 ### What happens at release time
 
 1. ~75 seconds before, a shohoz tab opens with a small status box (bottom-right).
-2. At the release second it checks for your train, about once a second.
+2. At 12 AM on the opening day it checks for your train, about once a second.
+   If nothing opens, it checks again at the zone time (8 AM / 2 PM).
 3. As soon as your class has online seats:
    - **the alarm rings** and a notification pops up
    - the page reloads and **scrolls to your train**

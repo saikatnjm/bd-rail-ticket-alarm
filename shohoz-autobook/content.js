@@ -407,29 +407,25 @@
     ok(`mission: ${cfg.fromCity} → ${cfg.toCity} on ${doj}`);
     ok(`train: "${cfg.trainQuery || "(first with seats)"}" class: ${cfg.classPriority}`);
 
-    // When does this journey date actually go on sale for the chosen train?
+    // When can this journey date go on sale at the earliest? The opening day
+    // is D - 10; on ordinary days the date can appear from 12 AM, so
+    // anything before that midnight is certainly too early.
     let releaseAt = null;
     try {
-      const num = (String(cfg.trainQuery).match(/\((\d+)\)/) || [])[1];
-      const openTime = (typeof RAIL_DATA !== "undefined" && num && RAIL_DATA.openingTimes[num]) || null;
-      if (openTime) {
-        const M = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
-        const [dd, mon, yyyy] = doj.split("-");
-        const [h, mi, s] = openTime.split(":").map(Number);
-        releaseAt = new Date(+yyyy, M[mon], +dd - 10, h, mi, s || 0);
-        const zone = RAIL_DATA.zones[num] || "?";
-        if (releaseAt.getTime() > Date.now())
-          warn(`${doj} tickets for this ${zone}-zone train release ${releaseAt.toLocaleString()}.`);
-        if (releaseAt.getTime() > mission.runAt + (cfg.maxWaitMinutes || 5) * 60_000) {
-          setStage("fail");
-          recordRun("too_early");
-          err(tx("⛔ Release is AFTER this run's window — polling now is pointless and gets you rate-limited. Aborting. Re-ARM: it will fire at the release time.",
-                 "⛔ এই তারিখের টিকিট এখনো ছাড়েনি — এখন খোঁজা অর্থহীন, উল্টো ব্লক খাওয়ার ঝুঁকি। বন্ধ করা হলো। ARM করুন — ছাড়ার সময়ে নিজেই চলবে।"));
-          notify(tx("Ticket Alarm stopped", "টিকিট অ্যালার্ম বন্ধ হয়েছে"),
-                 tx(`${doj} releases ${releaseAt.toLocaleString()}. Re-ARM for that time.`,
-                    `${doj}-এর টিকিট ছাড়বে ${releaseAt.toLocaleString("bn-BD")}। ARM করে রাখুন।`));
-          return;
-        }
+      const M = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
+      const [dd, mon, yyyy] = doj.split("-");
+      releaseAt = new Date(+yyyy, M[mon], +dd - 10, 0, 0, 0);
+      if (releaseAt.getTime() > Date.now())
+        warn(`${doj} can open from ${releaseAt.toLocaleString()} at the earliest.`);
+      if (releaseAt.getTime() > mission.runAt + (cfg.maxWaitMinutes || 5) * 60_000) {
+        setStage("fail");
+        recordRun("too_early");
+        err(tx("⛔ Release is AFTER this run's window — polling now is pointless and gets you rate-limited. Aborting. Re-ARM: it will fire at the release time.",
+               "⛔ এই তারিখের টিকিট এখনো ছাড়েনি — এখন খোঁজা অর্থহীন, উল্টো ব্লক খাওয়ার ঝুঁকি। বন্ধ করা হলো। ARM করুন — ছাড়ার সময়ে নিজেই চলবে।"));
+        notify(tx("Ticket Alarm stopped", "টিকিট অ্যালার্ম বন্ধ হয়েছে"),
+               tx(`${doj} releases ${releaseAt.toLocaleString()}. Re-ARM for that time.`,
+                  `${doj}-এর টিকিট ছাড়বে ${releaseAt.toLocaleString("bn-BD")}। ARM করে রাখুন।`));
+        return;
       }
     } catch (_) {}
 
@@ -521,8 +517,17 @@
       recordRun("no_train");
       err(tx("Gave up: no matching train/seats within the time window.",
              "সময়ের মধ্যে ট্রেন বা সিট পাওয়া যায়নি। বাদ দেওয়া হলো।"));
-      notify(tx("Ticket Alarm: no seats", "টিকিট অ্যালার্ম: সিট নেই"),
-             tx("No matching train or online seats found in time.", "সময়মতো ট্রেন বা অনলাইন সিট পাওয়া যায়নি।"));
+      if (mission.nextAt) {
+        const at = new Date(mission.nextAt);
+        warn(tx(`Not open at this check. Still armed: checks again at ${at.toLocaleString()}.`,
+                `এই সময়ে খোলেনি। ARM চালু আছে: আবার দেখবে ${at.toLocaleString("bn-BD")}-এ।`));
+        notify(tx("Ticket Alarm: not open yet", "টিকিট অ্যালার্ম: এখনো খোলেনি"),
+               tx(`Checks again at ${at.toLocaleString()} — leave the computer on.`,
+                  `আবার দেখবে ${at.toLocaleString("bn-BD")}-এ — কম্পিউটার চালু রাখুন।`));
+      } else {
+        notify(tx("Ticket Alarm: no seats", "টিকিট অ্যালার্ম: সিট নেই"),
+               tx("No matching train or online seats found in time.", "সময়মতো ট্রেন বা অনলাইন সিট পাওয়া যায়নি।"));
+      }
       return;
     }
 
@@ -540,6 +545,7 @@
     await chrome.storage.local.set({
       assistFound: { at: Date.now(), train: tn, cls: seatType.type, online },
     });
+    chrome.runtime.sendMessage({ type: "found", scheduled: !!mission.scheduled }).catch(() => {});
     location.href =
       "https://train.shohoz.com/booking/train/search?" +
       new URLSearchParams({ fromcity: cfg.fromCity, tocity: cfg.toCity, doj, class: seatType.type }).toString();

@@ -19,7 +19,7 @@ const DEFAULTS = {
   preferredCoaches: "",      // comma-separated coach prefixes, e.g. "THA,TA"
   preferredSeats: "",        // comma-separated exact seat numbers, e.g. "THA-21,THA-22"
   journeyDate: "",           // ISO yyyy-mm-dd, picked on the popup calendar
-  triggerTime: "auto",       // "auto" = from the train's zone; or explicit "HH:MM:SS"
+  triggerTime: "auto",       // "auto" = 12 AM on the opening day, then the train's zone time; or explicit "HH:MM:SS"
   startLeadMs: 500,          // tiny head start so the first search lands ~at the release second
   pollIntervalMs: 700,
   maxWaitMinutes: 5,
@@ -51,11 +51,10 @@ function dojFormat(d) {
   return `${String(d.getDate()).padStart(2, "0")}-${MONTHS[d.getMonth()]}-${d.getFullYear()}`;
 }
 
-// The release time is resolved, not asked: selected train's zone decides it
+// The zone time is resolved, not asked: selected train's zone decides it
 // (EAST 2 PM, WEST 8 AM); without a train, the earliest among the route's
-// known trains; failing that, 8 AM. An explicit cfg.triggerTime overrides.
-async function resolveTriggerTime(cfg) {
-  if (cfg.triggerTime && cfg.triggerTime !== "auto") return cfg.triggerTime;
+// known trains; failing that, 8 AM.
+async function resolveZoneTime(cfg) {
   const num = (String(cfg.trainQuery).match(/\((\d+)\)/) || String(cfg.trainQuery).trim().match(/^(\d+)$/) || [])[1];
   if (num && RAIL_DATA.openingTimes[num]) return RAIL_DATA.openingTimes[num];
   const { trainCache } = await chrome.storage.local.get("trainCache");
@@ -68,17 +67,39 @@ async function resolveTriggerTime(cfg) {
   return times[0] || "08:00:00";
 }
 
-// When should we fire for this journey date? The sale for date D opens on
-// D - 10 days at release time. If that morning is still ahead, fire then;
-// if the date is already on sale, fire at the next release time.
-function triggerForJourney(cfg, releaseTime) {
-  if (!cfg.journeyDate) return null;
-  const [h, m, s] = (releaseTime || "08:00:00").split(":").map((x) => parseInt(x, 10) || 0);
+function atTime(day, timeStr) {
+  const [h, m, s] = timeStr.split(":").map((x) => parseInt(x, 10) || 0);
+  const t = new Date(day);
+  t.setHours(h, m, s, 0);
+  return t;
+}
+
+// Checks to run for this journey date D. Its sale opens on D - 10 days, but
+// on ordinary days the new date can appear at midnight (the site rolls its
+// bookable dates over at 00:00), while the railway publishes per-zone times
+// (EAST 2 PM, WEST 8 AM). "auto" covers both: a short check at 12 AM and,
+// only if that finds nothing, another at the zone time. An explicit
+// triggerTime is a single check. A date already on sale gets one check at
+// the next zone time.
+async function stagesForJourney(cfg) {
+  if (!cfg.journeyDate) return [];
   const openDay = parseIso(cfg.journeyDate);
   openDay.setDate(openDay.getDate() - SALE_WINDOW_DAYS);
-  openDay.setHours(h, m, s, 0);
-  const next = nextTrigger(releaseTime);
-  return openDay.getTime() > next.getTime() ? openDay : next;
+  const soon = Date.now() + 5000;
+  if (cfg.triggerTime && cfg.triggerTime !== "auto") {
+    const t = atTime(openDay, cfg.triggerTime);
+    return [t.getTime() > soon ? t.getTime() : nextTrigger(cfg.triggerTime).getTime()];
+  }
+  const zone = await resolveZoneTime(cfg);
+  const stages = [atTime(openDay, "00:00:00"), atTime(openDay, zone)]
+    .map((t) => t.getTime())
+    .filter((t) => t > soon);
+  return stages.length ? stages : [nextTrigger(zone).getTime()];
+}
+
+async function setLaunchAlarm(at) {
+  await chrome.alarms.clear(ALARM_NAME);
+  await chrome.alarms.create(ALARM_NAME, { when: Math.max(at - PRELAUNCH_LEAD_MS, Date.now() + 1000) });
 }
 
 function searchUrl(cfg, doj) {
@@ -93,36 +114,31 @@ function searchUrl(cfg, doj) {
 
 async function arm() {
   const cfg = await getConfig();
-  const releaseTime = await resolveTriggerTime(cfg);
-  const trigger = triggerForJourney(cfg, releaseTime);
-  if (!trigger) return { error: "no journey date set" };
+  if (!cfg.journeyDate) return { error: "no journey date set" };
   if (parseIso(cfg.journeyDate).getTime() < new Date().setHours(0, 0, 0, 0)) {
     return { error: "journey date is in the past" };
   }
-  const when = trigger.getTime() - PRELAUNCH_LEAD_MS;
-  await chrome.alarms.clear(ALARM_NAME);
-  await chrome.alarms.create(ALARM_NAME, { when: Math.max(when, Date.now() + 1000) });
-  // Reminders: the day before and one hour before the booking moment.
+  const stages = await stagesForJourney(cfg);
+  const first = stages[0];
+  await setLaunchAlarm(first);
+  // Reminders: the day before and one hour before the first check.
   await chrome.alarms.clear(REMIND_1D);
   await chrome.alarms.clear(REMIND_1H);
-  if (trigger.getTime() - 86_400_000 > Date.now() + 60_000) {
-    await chrome.alarms.create(REMIND_1D, { when: trigger.getTime() - 86_400_000 });
+  if (first - 86_400_000 > Date.now() + 60_000) {
+    await chrome.alarms.create(REMIND_1D, { when: first - 86_400_000 });
   }
-  if (trigger.getTime() - 3_600_000 > Date.now() + 60_000) {
-    await chrome.alarms.create(REMIND_1H, { when: trigger.getTime() - 3_600_000 });
+  if (first - 3_600_000 > Date.now() + 60_000) {
+    await chrome.alarms.create(REMIND_1H, { when: first - 3_600_000 });
   }
-  await chrome.storage.local.set({
-    armedTrigger: trigger.getTime(),
-    mission: null,
-  });
-  return { trigger: trigger.getTime() };
+  await chrome.storage.local.set({ armedTrigger: first, armedStages: stages, mission: null });
+  return { trigger: first, stages };
 }
 
 async function disarm() {
   await chrome.alarms.clear(ALARM_NAME);
   await chrome.alarms.clear(REMIND_1D);
   await chrome.alarms.clear(REMIND_1H);
-  await chrome.storage.local.set({ armedTrigger: null, mission: null });
+  await chrome.storage.local.set({ armedTrigger: null, armedStages: null, mission: null });
 }
 
 async function sendReminder(kind) {
@@ -148,17 +164,17 @@ async function sendReminder(kind) {
   });
 }
 
-async function launchMission(runNow = false) {
+async function launchMission(runAt, { nextAt = null, scheduled = false } = {}) {
   const cfg = await getConfig();
   if (!cfg.journeyDate) return;
-  const releaseTime = await resolveTriggerTime(cfg);
-  const trigger = runNow ? new Date(Date.now() + 5000) : (triggerForJourney(cfg, releaseTime) || new Date());
   const doj = dojFormat(parseIso(cfg.journeyDate));
   const url = searchUrl(cfg, doj);
 
   const mission = {
     createdAt: Date.now(),
-    runAt: trigger.getTime(),
+    runAt,
+    nextAt, // a later check is still armed if this one finds nothing
+    scheduled, // false for "Test run now"
     doj,
     status: "launched",
   };
@@ -194,10 +210,27 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === REMIND_1D) return sendReminder("1d");
   if (alarm.name === REMIND_1H) return sendReminder("1h");
   if (alarm.name !== ALARM_NAME) return;
-  await launchMission(false);
-  // One-shot: each arming books one specific journey date.
-  await chrome.storage.local.set({ armedTrigger: null });
+  const { armedStages, armedTrigger } = await chrome.storage.local.get(["armedStages", "armedTrigger"]);
+  const stages = armedStages?.length ? armedStages : [armedTrigger || Date.now() + 5000];
+  const [runAt, ...rest] = stages;
+  if (rest.length) {
+    await setLaunchAlarm(rest[0]);
+    await chrome.storage.local.set({ armedTrigger: rest[0], armedStages: rest });
+  } else {
+    await chrome.storage.local.set({ armedTrigger: null, armedStages: null });
+  }
+  await launchMission(runAt, { nextAt: rest[0] || null, scheduled: true });
 });
+
+async function openSite() {
+  const tabs = await chrome.tabs.query({ url: "https://train.shohoz.com/*" });
+  if (tabs.length > 0) {
+    await chrome.tabs.update(tabs[0].id, { active: true });
+    await chrome.windows.update(tabs[0].windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url: "https://train.shohoz.com/", active: true });
+  }
+}
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   (async () => {
@@ -205,7 +238,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       case "arm": {
         const r = await arm();
         if (r.error) sendResponse({ ok: false, error: r.error });
-        else sendResponse({ ok: true, trigger: r.trigger });
+        else sendResponse({ ok: true, trigger: r.trigger, stages: r.stages });
         break;
       }
       case "disarm": {
@@ -214,7 +247,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         break;
       }
       case "runNow": {
-        await launchMission(true);
+        await launchMission(Date.now() + 5000);
+        sendResponse({ ok: true });
+        break;
+      }
+      case "found": {
+        // Seats are open: the later fallback check is no longer needed.
+        // A test run must not cancel the real ARM.
+        if (msg.scheduled) await disarm();
+        sendResponse({ ok: true });
+        break;
+      }
+      case "openSite": {
+        await openSite();
         sendResponse({ ok: true });
         break;
       }

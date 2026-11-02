@@ -12,7 +12,7 @@ and lights up the BOOK NOW button and good seats. You click, you pay — nothing
 
 ## Features
 
-- Calendar date picking — works out the release time (10 days before, 8 AM WEST zone / 2 PM EAST zone)
+- Calendar date picking — works out the opening day (10 days before) and checks at 12 AM, then at the zone time (WEST 8 AM / EAST 2 PM) if needed
 - Countdown, plus reminders 1 day and 1 hour before
 - Checks for your train at the exact release second, about once a second
 - Loud alarm when seats open; scrolls to your train and makes BOOK NOW glow

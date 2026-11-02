@@ -39,7 +39,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
 <section id="what">
   <h2>What it does</h2>
   <div class="grid">
-    <div class="card"><h3>📅 Pick a travel date</h3><p>Tap your journey date on a calendar. It works out when those tickets open: 10 days before, at 8 AM or 2 PM depending on the train.</p></div>
+    <div class="card"><h3>📅 Pick a travel date</h3><p>Tap your journey date on a calendar. It works out the opening day (10 days before) and checks at 12 AM, then again at the train's zone time (8 AM or 2 PM) if needed.</p></div>
     <div class="card"><h3>⏱️ Counts down</h3><p>A big countdown card, plus reminders a day before and an hour before.</p></div>
     <div class="card"><h3>🔔 Rings when seats open</h3><p>At the release second it checks for your train. The moment your class has online seats, a loud alarm rings.</p></div>
     <div class="card"><h3>✨ Lights up BOOK NOW</h3><p>The page jumps to your train and its BOOK NOW button glows yellow.</p></div>
@@ -93,10 +93,10 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
   <p>The panel has five numbered steps. A finished step folds to one line with a ✓ — tap it to open it again.
      The <b>বাং</b> button at the top switches the whole panel to Bangla.</p>
   <ol class="steps">
-    <li><b>Log in.</b> Open train.shohoz.com and log in. The panel shows a green ✓ when it sees you're logged in. (You always log in yourself — the extension never asks for your password.)</li>
+    <li><b>Log in.</b> Press <b>🌐 Open site</b> at the top of the panel — it opens train.shohoz.com for you (or jumps to the tab if it's already open). Log in there. The panel shows a green ✓ when it sees you're logged in. (You always log in yourself — the extension never asks for your password.)</li>
     <li><b>Route.</b> Type the From and To stations and pick them from the suggestions.</li>
     <li><b>Date.</b> Tap your travel date. The line underneath says when those tickets go on sale.</li>
-    <li><b>Train.</b> Press <b>⟳ Load trains</b> and pick yours. The list shows departure → arrival times. The release time (8 AM or 2 PM) is set for you from the train.</li>
+    <li><b>Train.</b> Press <b>⟳ Load trains</b> and pick yours. The list shows departure → arrival times. The check times are set for you: 12 AM on the opening day, then the train's zone time (WEST 8 AM, EAST 2 PM).</li>
     <li><b>Seats &amp; class.</b> Choose the class (for example <code>S_CHAIR</code>), how many seats (1–4), and optionally preferred coaches (<code>THA,TA</code>) or exact seats (<code>THA-21,THA-22</code>).</li>
     <li><b>ARM.</b> Press <b>ARM</b>. The button turns red and a green card counts down. You can close the panel now.</li>
   </ol>
@@ -110,13 +110,15 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (t
     <tr><td>1 day before</td><td>Reminder notification: “Tickets open tomorrow”.</td></tr>
     <tr><td>1 hour before</td><td>Reminder notification. Check you're logged in.</td></tr>
     <tr><td>~75 seconds before</td><td>A train.shohoz.com tab opens with a small status box at the bottom-right.</td></tr>
-    <tr><td>Release second</td><td>It starts checking for your train, about once a second.</td></tr>
+    <tr><td>12:00 AM on the opening day</td><td>It starts checking for your train, about once a second, for up to 5 minutes.</td></tr>
+    <tr><td>Zone time (8 AM / 2 PM)</td><td>Only if the 12 AM check found nothing: the same check runs again. If seats were found at 12 AM, this is cancelled.</td></tr>
     <tr><td>Seats appear</td><td>🔔 Alarm + notification. The page reloads, scrolls to your train, and your class's BOOK NOW glows.</td></tr>
     <tr><td>You click BOOK NOW</td><td>The seat map opens with the best seats outlined. If another coach has more free seats, the status box says which.</td></tr>
     <tr><td>You finish</td><td>Click the outlined seats → <b>CONTINUE PURCHASE</b> → OTP → payment.</td></tr>
   </table></div>
   <p>Click anywhere on the page to stop the alarm. Press <b>■ STOP</b> (in the panel or on the page) to stop everything.</p>
-  <p>If nothing opens within 5 minutes (changeable under <i>Advanced</i>), it gives up and tells you.</p>
+  <p>Each check lasts up to 5 minutes (changeable under <i>Advanced</i>). If the 12 AM check finds nothing, the notification says when it will check again — leave the computer on.</p>
+  <div class="note"><b>Why two times?</b> The railway's system lists an official opening time per zone (WEST 8 AM, EAST 2 PM), but users have seen new dates open at midnight on ordinary days. Checking at both covers either case with two short checks. To use one fixed time instead, pick it under <i>Advanced → Release time</i>.</div>
 </section>
 
 <section id="seats">

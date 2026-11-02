@@ -142,8 +142,8 @@ function fmtTime12(hhmmss) {
   const h = parseInt(hhmmss, 10);
   const h12 = h % 12 === 0 ? 12 : h % 12;
   if (LANG === "bn") {
-    const part = h < 12 ? "সকাল" : h < 16 ? "দুপুর" : h < 19 ? "বিকাল" : "রাত";
-    return `${part} ${h12}টা`;
+    const part = h < 4 || h >= 19 ? "রাত" : h < 12 ? "সকাল" : h < 16 ? "দুপুর" : "বিকাল";
+    return `${part} ${String(h12).replace(/\d/g, (x) => "০১২৩৪৫৬৭৮৯"[x])}টা`;
   }
   return `${h12}:00 ${h < 12 ? "AM" : "PM"}`;
 }
@@ -153,19 +153,30 @@ let routeTrains = []; // last loaded/cached train list for the current route
 function resolveReleaseTime() {
   const override = $("triggerTime").value;
   if (override && override !== "auto") {
-    return { time: override, label: fmtTime12(override), src: t("srcManual") };
+    return { time: override, label: fmtTime12(override), zoneLabel: fmtTime12(override), src: t("srcManual"), manual: true };
   }
+  const auto = (time, src) => ({ time, zoneLabel: fmtTime12(time), label: t("twoStage", { t: fmtTime12(time) }), src });
   const info = trainReleaseInfo($("trainQuery").value.trim() || $("trainSelect").value);
-  if (info) return { time: info.time, label: info.label, src: t("srcZone", { zone: info.zone }) };
+  if (info) return auto(info.time, t("srcZone", { zone: info.zone }));
   const times = routeTrains
     .map((x) => trainReleaseInfo(x.name))
     .filter(Boolean)
     .map((i) => i.time);
-  if (times.length) {
-    const time = times.sort()[0];
-    return { time, label: fmtTime12(time), src: t("srcRoute") };
-  }
-  return { time: "08:00:00", label: fmtTime12("08:00:00"), src: t("srcDefault") };
+  if (times.length) return auto(times.sort()[0], t("srcRoute"));
+  return auto("08:00:00", t("srcDefault"));
+}
+
+// Same rule as the background: the date opens on D - 10, possibly from
+// 12 AM, and the zone time is the railway's published release.
+function saleState(jdIso, rel) {
+  const openDay = addDays(day0(fromIso(jdIso)), -SALE_WINDOW_DAYS);
+  const [h, m] = rel.time.split(":").map(Number);
+  const zoneAt = new Date(openDay); zoneAt.setHours(h, m, 0, 0);
+  const now = Date.now();
+  const firstAt = rel.manual ? zoneAt.getTime() : openDay.getTime();
+  if (firstAt > now) return { state: "later", openDay };
+  if (!rel.manual && zoneAt.getTime() > now) return { state: "today", openDay };
+  return { state: "onSale", openDay };
 }
 
 // ---------- progressive enable: from/to → date → trains ----------
@@ -219,12 +230,12 @@ function refreshFlow() {
   if (!routeOk) { $("dojPreview").textContent = t("pickStations"); return; }
   if (!jd) { $("dojPreview").textContent = t("pickDate"); return; }
   const d = day0(fromIso(jd));
-  const today = day0(new Date());
-  const openDay = addDays(d, -SALE_WINDOW_DAYS);
   const rel = resolveReleaseTime();
-  $("dojPreview").textContent = openDay <= today
-    ? t("onSaleNow", { d: dojFmt(d), t: rel.label })
-    : t("opensLater", { d: dojFmt(d), od: dojFmt(openDay), t: rel.label, src: rel.src });
+  const sale = saleState(jd, rel);
+  $("dojPreview").textContent =
+    sale.state === "later" ? t("opensLater", { d: dojFmt(d), od: dojFmt(sale.openDay), t: rel.label, src: rel.src })
+    : sale.state === "today" ? t("openingToday", { d: dojFmt(d), t: rel.zoneLabel })
+    : t("onSaleNow", { d: dojFmt(d), t: rel.zoneLabel });
   refreshTrainInfo();
 }
 
@@ -247,14 +258,14 @@ function refreshTrainInfo() {
   const jd = $("journeyDate").value;
   if (jd) {
     const d = day0(fromIso(jd));
-    const openDay = addDays(d, -SALE_WINDOW_DAYS);
-    line += openDay <= day0(new Date())
-      ? t("onSaleNowShort", { d: dojFmt(d) })
-      : t("opensShort", { d: dojFmt(d), od: dojFmt(openDay), t: info.label });
+    const sale = saleState(jd, resolveReleaseTime());
+    line += sale.state === "later" ? t("opensShort", { d: dojFmt(d), od: dojFmt(sale.openDay) })
+      : sale.state === "today" ? t("openingTodayShort", { d: dojFmt(d) })
+      : t("onSaleNowShort", { d: dojFmt(d) });
   }
   el.textContent = line;
   const override = $("triggerTime").value;
-  if (override !== "auto" && override !== info.time) {
+  if (override && override !== "auto" && override !== info.time) {
     el.textContent += t("overrideWarn", { t: fmtTime12(override) });
     el.style.color = "#ffd166";
   } else {
@@ -382,9 +393,9 @@ async function saveConfig() {
 let armedCache = null; // refreshed every 5s; countdown renders from it every 1s
 
 async function refreshArmState() {
-  const { armedTrigger, config } = await chrome.storage.local.get(["armedTrigger", "config"]);
+  const { armedTrigger, armedStages, config } = await chrome.storage.local.get(["armedTrigger", "armedStages", "config"]);
   armedCache = armedTrigger && armedTrigger > Date.now()
-    ? { at: armedTrigger, train: config?.trainQuery, from: config?.fromCity, to: config?.toCity, doj: config?.journeyDate }
+    ? { at: armedTrigger, then: armedStages?.[1] || null, train: config?.trainQuery, from: config?.fromCity, to: config?.toCity, doj: config?.journeyDate }
     : null;
   const btn = $("arm");
   if (armedCache) {
@@ -412,7 +423,9 @@ function renderNextCard() {
   $("ncCount").textContent = LANG === "bn"
     ? `${h}ঘ ${m}মি ${s}সে পরে`
     : `in ${h}h ${m}m ${s}s`;
-  $("ncWhen").textContent = new Date(armedCache.at).toLocaleString(LANG === "bn" ? "bn-BD" : undefined);
+  const loc = LANG === "bn" ? "bn-BD" : undefined;
+  $("ncWhen").textContent = new Date(armedCache.at).toLocaleString(loc) +
+    (armedCache.then ? t("thenAgain", { t: new Date(armedCache.then).toLocaleTimeString(loc, { hour: "numeric", minute: "2-digit" }) }) : "");
 }
 
 // ---------- login indicator ----------
@@ -583,6 +596,10 @@ $("langToggle").onclick = async () => {
 };
 
 $("loginCheck").onclick = () => checkLogin(true);
+$("openSite").onclick = async () => {
+  await chrome.runtime.sendMessage({ type: "openSite" });
+  window.close();
+};
 
 $("trainSelect").addEventListener("change", () => {
   $("trainQuery").value = $("trainSelect").value;
