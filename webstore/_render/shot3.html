@@ -5,15 +5,15 @@
  .sel { border: 1px solid #c9d2ce; border-radius: 6px; padding: 5px 10px; font-weight: 500; background: #fff; }
  .grid { display: grid; grid-template-columns: repeat(5, 62px); gap: 6px 8px; padding: 14px 24px; }
  .seat { font-size: 11px; text-align: center; padding: 6px 0; border-radius: 6px; }
- .free { background: #e2f4ea; border: 1px solid #2e7d5b; color: #1d5a40; }
- .booked { background: #dfe3e1; color: #9aa6a0; border: 1px solid #dfe3e1; }
+ .free { background: #D2DDDB; border: 1px solid #D2DDDB; color: #006747; font-weight: 700; }
+ .booked { background: #e0882e; color: #fff; border: 1px solid #e0882e; font-weight: 700; }
  .aisle { width: 10px; }
  .legend { position: absolute; left: 400px; font-size: 12px; top: 70px; font-size: 13px; line-height: 2; color: #44554d; }
  .legend span { display: inline-block; width: 18px; height: 14px; border-radius: 4px; vertical-align: middle; margin-right: 6px; }
 </style></head><body>
 <div class="copy">
   <div class="brand"><img src="../../shohoz-autobook/icon128.png">BD Rail Ticket Alarm</div>
-  <h1>Good seats, <em>outlined</em> for you</h1>
+  <h1>Good seats, <em style="color:#5b9bff">ringed in blue</em> for you</h1>
   <ul>
     <li>Middle of the coach — away from doors</li>
     <li>Side by side for 2+ tickets</li>
@@ -40,9 +40,9 @@
 <span class="seat booked">JHA-53</span><span class="seat booked">JHA-54</span><span class="aisle"></span><span class="seat booked">JHA-55</span><span class="seat booked">JHA-56</span>
 <span class="seat booked">JHA-57</span><span class="seat booked">JHA-58</span><span class="aisle"></span><span class="seat booked">JHA-59</span><span class="seat booked">JHA-60</span>  </div>
   <div class="legend">
-    <div><span style="background:#e2f4ea;border:1px solid #2e7d5b"></span>Available</div>
-    <div><span style="background:#dfe3e1"></span>Booked</div>
-    <div><span style="background:#e2f4ea;outline:3px solid #ffd166"></span>Suggested by Ticket Alarm</div>
+    <div><span style="background:#D2DDDB"></span>Available</div>
+    <div><span style="background:#e0882e"></span>Booked</div>
+    <div><span style="background:#D2DDDB;outline:3px solid #0b63ff;outline-offset:1px"></span>Suggested by Ticket Alarm</div>
   </div>
   <div class="overlay">
     <div class="hd"><b style="color:#6fe3a5">🚆 Ticket Alarm</b><span class="stop">■ STOP</span></div>

@@ -32,7 +32,8 @@
     st.textContent = `
       .ab-pulse { outline: 4px solid #ffd166 !important; outline-offset: 3px; animation: abPulse 1s infinite; }
       @keyframes abPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,209,102,.9); } 50% { box-shadow: 0 0 0 12px rgba(255,209,102,0); } }
-      .ab-suggest { outline: 3px solid #ffd166 !important; outline-offset: 2px; box-shadow: 0 0 12px 3px rgba(255,209,102,.85) !important; }
+      .ab-suggest { outline: 4px solid #0b63ff !important; outline-offset: 3px; animation: abSeat 1.1s ease-in-out infinite; }
+      @keyframes abSeat { 0%,100% { box-shadow: 0 0 0 3px rgba(11,99,255,.35), 0 0 14px 4px rgba(11,99,255,.85); } 50% { box-shadow: 0 0 0 7px rgba(11,99,255,.15), 0 0 22px 8px rgba(11,99,255,.55); } }
     `;
     document.documentElement.appendChild(st);
   }

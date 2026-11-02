@@ -19,7 +19,7 @@ OTP and payment.
 - **Watches at the exact second** tickets open, synced to the railway server's clock
 - **Rings a loud alarm** when your train has seats — keeps ringing until you click the page
 - **Lights up BOOK NOW** — scrolls to your train and makes its button glow
-- **Outlines the best seats** in the seat map — middle of the coach, side by side for 2+ tickets, or your exact seats / coaches if you set them
+- **Rings the best seats in blue** in the seat map — middle of the coach, side by side for 2+ tickets, or your exact seats / coaches if you set them
 - **Tells you the fuller coach** if a different coach has more free seats
 - **Reminds you beforehand** — a notification 1 day before and 1 hour before
 - **Shows if you're logged in** — green tick / red cross; buttons stay off until you log in

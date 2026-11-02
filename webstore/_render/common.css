@@ -16,4 +16,4 @@ body { font-family: system-ui, "Noto Sans Bengali", sans-serif; background: radi
 .overlay .sub { color: #9adbb8; margin: 2px 0 4px; white-space: pre-wrap; }
 .overlay a { color: #7fae95; text-decoration: underline; font-size: 11px; }
 .pulse { outline: 4px solid #ffd166; outline-offset: 3px; box-shadow: 0 0 0 10px rgba(255,209,102,.35); }
-.suggest { outline: 3px solid #ffd166; outline-offset: 2px; box-shadow: 0 0 12px 3px rgba(255,209,102,.85); }
+.suggest { outline: 4px solid #0b63ff; outline-offset: 3px; box-shadow: 0 0 0 4px rgba(11,99,255,.3), 0 0 16px 5px rgba(11,99,255,.8); }
