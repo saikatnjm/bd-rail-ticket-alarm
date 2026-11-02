@@ -10,6 +10,21 @@ and lights up the BOOK NOW button and good seats. You click, you pay — nothing
 
 ![The panel with a countdown to release time](docs/img/screenshot-1.png)
 
+## Why use it?
+
+Bangladesh Railway tickets go on sale 10 days before the journey, and popular trains often sell out in minutes.
+Nobody has time to sit refreshing eticket.railway.gov.bd waiting for the release. BD Rail Ticket Alarm watches for you.
+It rings the moment your train opens and takes you straight to BOOK NOW and the best seats, so you're among the first, not the last.
+
+- ⏰ **Never miss the release time.** It works out when your date opens.
+- 🔕 **No more endless refreshing.** One alarm, right on time.
+- 🪑 **No more hunting for seats.** Good seats are ringed in blue for you.
+
+*Free · English & বাংলা · You still choose, book and pay yourself.*
+
+**কেন ব্যবহার করবেন?** ট্রেনের অগ্রিম টিকিট যাত্রার ১০ দিন আগে ছাড়ে, আর জনপ্রিয় ট্রেনের টিকিট কয়েক মিনিটেই শেষ হয়ে যায়।
+এই এক্সটেনশন আপনার হয়ে নজর রাখে, টিকিট খোলামাত্র অ্যালার্ম বাজায় আর সরাসরি BOOK NOW ও সেরা সিটে নিয়ে যায়। [বাংলা গাইড →](https://saikatnjm.github.io/bd-rail-ticket-alarm/bn.html)
+
 ## Features
 
 - Calendar date picking — works out the opening day (10 days before) and checks at 12 AM, then at the zone time (WEST 8 AM / EAST 2 PM) if needed
