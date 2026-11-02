@@ -215,6 +215,7 @@ for (const i of [1, 2, 3, 4]) {
 
 function refreshFlow() {
   const routeOk = validStation($("fromCity").value) && validStation($("toCity").value);
+  if (routeOk) scheduleAutoLoad();
   $("cal").classList.toggle("disabled", !routeOk);
   $("loadTrains").disabled = !routeOk;
   $("checkSeats").disabled = !routeOk || !$("journeyDate").value;
@@ -263,13 +264,16 @@ function refreshTrainInfo() {
       : sale.state === "today" ? t("openingTodayShort", { d: dojFmt(d) })
       : t("onSaleNowShort", { d: dojFmt(d) });
   }
+  const known = routeTrains.find((x) => x.name === name);
+  const offWarn = jd && known?.offDays?.includes(fromIso(jd).getDay());
+  if (offWarn) line += t("offDayWarn", { day: t("dayNames")[fromIso(jd).getDay()] });
   el.textContent = line;
   const override = $("triggerTime").value;
   if (override && override !== "auto" && override !== info.time) {
     el.textContent += t("overrideWarn", { t: fmtTime12(override) });
     el.style.color = "#ffd166";
   } else {
-    el.style.color = "#6fe3a5";
+    el.style.color = offWarn ? "#ffd166" : "#6fe3a5";
   }
 }
 
@@ -291,7 +295,8 @@ function fillTrainSelect(trains, doj) {
     let times = "";
     if (x.departure && x.arrival) times = ` — ${x.departure} → ${x.arrival}`;
     else if (x.departure) times = ` — ${x.departure}`;
-    o.textContent = x.name + times; // release time lives in the info line only
+    const off = (x.offDays || []).map((d) => t("dayNames")[d]).join(", ");
+    o.textContent = x.name + times + (off ? t("offDayTag", { days: off }) : ""); // release time lives in the info line only
     sel.appendChild(o);
   }
   sel.disabled = false;
@@ -306,11 +311,11 @@ async function loadCachedTrains() {
   if (entry) fillTrainSelect(entry.trains, null);
 }
 
-async function loadTrains() {
+async function loadTrains({ auto = false } = {}) {
   await saveConfig();
-  setStatus(t("loadingTrains"));
   const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
-  if (tabs.length === 0) { setStatus(t("loginThenRetry")); return; }
+  if (tabs.length === 0) { if (!auto) setStatus(t("loginThenRetry")); return; }
+  setStatus(t("loadingTrains"));
   const today = day0(new Date());
   const dates = [];
   const jd = $("journeyDate").value ? day0(fromIso($("journeyDate").value)) : null;
@@ -334,6 +339,7 @@ async function loadTrains() {
       dates,
     });
     if (!res?.ok) {
+      if (auto && res?.error === "NOT_LOGGED_IN") { setStatus(""); return; }
       setStatus(t("loadFail", { e: res?.error || "?" }) + (res?.error === "NOT_LOGGED_IN" ? t("loginToLoad") : ""));
       return;
     }
@@ -608,7 +614,25 @@ $("trainSelect").addEventListener("change", () => {
 });
 $("trainQuery").addEventListener("change", () => { saveConfig(); refreshFlow(); });
 $("trainQuery").addEventListener("input", refreshTrainInfo);
-$("loadTrains").onclick = loadTrains;
+$("loadTrains").onclick = () => loadTrains();
+
+// Load the route's trains by itself once both stations are picked, unless a
+// recent list is already saved. One load per route per panel opening.
+const TRAIN_CACHE_MAX_AGE_MS = 12 * 3600_000;
+let autoLoadedKey = null, autoLoadTimer = null;
+function scheduleAutoLoad() {
+  clearTimeout(autoLoadTimer);
+  autoLoadTimer = setTimeout(async () => {
+    if (!validStation($("fromCity").value) || !validStation($("toCity").value)) return;
+    const key = routeKey();
+    if (autoLoadedKey === key) return;
+    const { trainCache } = await chrome.storage.local.get("trainCache");
+    const entry = trainCache?.[key];
+    const fresh = entry && Date.now() - entry.at < TRAIN_CACHE_MAX_AGE_MS && entry.trains?.every((x) => Array.isArray(x.offDays));
+    autoLoadedKey = key;
+    if (!fresh) loadTrains({ auto: true });
+  }, 500);
+}
 
 $("openTab").onclick = () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("popup.html?tab=1") });

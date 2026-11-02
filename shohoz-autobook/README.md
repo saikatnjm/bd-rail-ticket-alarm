@@ -51,7 +51,7 @@ tap it to open it again.
 
 1. **Route** — type and pick From / To stations from the suggestions.
 2. **Date** — tap your travel date. The line below tells you when it goes on sale.
-3. **Train** — press **⟳ Load trains**, pick your train. The check times are
+3. **Train** — the route's trains load by themselves (⟳ refreshes); pick yours. Days a train doesn't run are shown, e.g. “not on Wednesday”. The check times are
    set for you: 12 AM on the opening day, then the zone time (WEST 8 AM, EAST 2 PM).
 4. **Seats & class** — class (e.g. `S_CHAIR`), how many seats, and optionally
    preferred coaches (`THA,TA`) or exact seats (`THA-21,THA-22`).

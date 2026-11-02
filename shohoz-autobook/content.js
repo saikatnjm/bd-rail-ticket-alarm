@@ -567,10 +567,21 @@
   }
 
   // ---------- train list for the popup dropdown ----------
+  // Trains have a weekly day off, so one date's list can miss a train.
+  // Merge two dates (consecutive entries in `dates` fall on different
+  // weekdays) and remember the weekdays each train was absent.
   async function listTrains(from, to, dates) {
     if (!authHeaders()) return { ok: false, error: "NOT_LOGGED_IN" };
+    const M = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
+    const weekday = (doj) => { const [d, m, y] = doj.split("-"); return new Date(+y, M[m], +d).getDay(); };
+    const timePart = (v) => String(v || "").split(",").pop().trim();
     let lastErr = "no trains found on any date tried";
+    const byName = new Map();
+    const seenDays = [];
+    let firstDoj = null;
     for (const doj of dates) {
+      if (seenDays.length >= 2) break;
+      if (seenDays.length) await sleep(900);
       try {
         const { status, json } = await api("GET", "/bookings/search-trips-v2", {
           params: { from_city: from, to_city: to, date_of_journey: doj, seat_class: "S_CHAIR" },
@@ -582,21 +593,43 @@
         }
         const raw = json?.data?.trains || json?.data || [];
         if (!Array.isArray(raw) || raw.length === 0) continue;
-        const timePart = (v) => String(v || "").split(",").pop().trim();
-        const trains = raw.map((t) => ({
-          name: String(t.trip_number || t.train_name || ""),
-          departure: timePart(t.departure_date_time || t.departure_time),
-          arrival: timePart(t.arrival_date_time || t.arrival_time),
-          duration: String(t.travel_time || ""),
-          classes: (t.seat_types || []).map((s) => s.type).filter(Boolean),
-        }));
-        return { ok: true, doj, trains };
+        const wd = weekday(doj);
+        seenDays.push(wd);
+        firstDoj = firstDoj || doj;
+        for (const t of raw) {
+          const name = String(t.trip_number || t.train_name || "");
+          if (!name || byName.has(name)) { if (byName.has(name)) byName.get(name).runsOn.push(wd); continue; }
+          byName.set(name, {
+            name,
+            departure: timePart(t.departure_date_time || t.departure_time),
+            arrival: timePart(t.arrival_date_time || t.arrival_time),
+            duration: String(t.travel_time || ""),
+            classes: (t.seat_types || []).map((x) => x.type).filter(Boolean),
+            runsOn: [wd],
+          });
+        }
       } catch (e) {
         lastErr = e.message;
       }
     }
-    return { ok: false, error: lastErr };
+    if (!byName.size) return { ok: false, error: lastErr };
+    const trains = [...byName.values()].map(({ runsOn, ...t }) => ({
+      ...t,
+      offDays: seenDays.filter((d) => !runsOn.includes(d)),
+    }));
+    trains.sort((a, b) => toMinutes(a.departure) - toMinutes(b.departure));
+    return { ok: true, doj: firstDoj, trains };
   }
+
+  function toMinutes(hhmm) {
+    const m = String(hhmm).match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+    if (!m) return 9999;
+    let h = +m[1] % 12;
+    if (m[3] && m[3].toLowerCase() === "pm") h += 12;
+    if (!m[3]) h = +m[1];
+    return h * 60 + +m[2];
+  }
+
 
   // ---------- bootstrap ----------
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {

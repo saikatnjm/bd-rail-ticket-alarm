@@ -108,6 +108,9 @@ const I18N = {
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
     monthsShort: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     dows: ["Su","Mo","Tu","We","Th","Fr","Sa"],
+    dayNames: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+    offDayTag: " · not on {days}",
+    offDayWarn: " · ⚠ didn't run on a {day} — check it runs on your date",
   },
   bn: {
     title: "🚆 বিডি রেল টিকিট অ্যালার্ম",
@@ -217,5 +220,8 @@ const I18N = {
     months: ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"],
     monthsShort: ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টে","অক্টো","নভে","ডিসে"],
     dows: ["রবি","সোম","মঙ্গল","বুধ","বৃহ","শুক্র","শনি"],
+    dayNames: ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"],
+    offDayTag: " · {days} বন্ধ",
+    offDayWarn: " · ⚠ {day} চলেনি — আপনার তারিখে চলে কি না দেখে নিন",
   },
 };
