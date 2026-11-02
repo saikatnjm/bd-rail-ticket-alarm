@@ -7,6 +7,13 @@
 // is protected by the site's bot check, so the extension never calls it.
 
 (() => {
+  // Added again into an already-open tab after an install or update: run once
+  // per live extension instance. An instance orphaned by a reload can no
+  // longer reach chrome.runtime, so it doesn't count.
+  const prev = window.__ticketAlarmAlive;
+  if (prev && prev()) return;
+  window.__ticketAlarmAlive = ((rt) => () => { try { return !!rt?.id; } catch (_) { return false; } })(chrome.runtime);
+
   const API = "https://railspaapi.shohoz.com/v1.0/web";
   const ASSIST_TTL_MS = 15 * 60_000; // how long a "seats are open" handoff stays active
   let overlay, logBox, mission, cfg;
@@ -32,6 +39,16 @@
     st.textContent = `
       .ab-pulse { outline: 4px solid #ffd166 !important; outline-offset: 3px; animation: abPulse 1s infinite; }
       @keyframes abPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,209,102,.9); } 50% { box-shadow: 0 0 0 12px rgba(255,209,102,0); } }
+      .ab-hot { border: 2px solid #0b63ff !important; animation: abHot 1.4s ease-in-out infinite; }
+      @keyframes abHot { 0%,100% { box-shadow: 0 0 0 0 rgba(11,99,255,.65), 0 8px 28px rgba(0,0,0,.5); } 50% { box-shadow: 0 0 0 9px rgba(11,99,255,0), 0 8px 28px rgba(0,0,0,.5); } }
+      .ab-hot #ab-stage { font-size: 18px !important; }
+      .ab-hot #ab-sub { font: 600 13.5px/1.45 system-ui, sans-serif !important; }
+      .ab-chip { display: inline-block; margin: 6px 6px 0 0; padding: 5px 12px; border-radius: 999px; border: none;
+        background: #0b63ff; color: #fff; font: 800 15px/1.2 system-ui, sans-serif; cursor: pointer;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 8px rgba(11,99,255,.5); }
+      .ab-chip-coach { background: #1c3a2b; color: #d8ffe9; cursor: default; box-shadow: none; border: 1px solid #2e6b50; font-size: 14px; }
+      .ab-flash { animation: abFlash .4s ease-in-out 3 !important; }
+      @keyframes abFlash { 50% { transform: scale(1.25); } }
       .ab-suggest { outline: 4px solid #0b63ff !important; outline-offset: 3px; animation: abSeat 1.1s ease-in-out infinite; }
       @keyframes abSeat { 0%,100% { box-shadow: 0 0 0 3px rgba(11,99,255,.35), 0 0 14px 4px rgba(11,99,255,.85); } 50% { box-shadow: 0 0 0 7px rgba(11,99,255,.15), 0 0 22px 8px rgba(11,99,255,.55); } }
     `;
@@ -57,9 +74,11 @@
        </div>
        <div id="ab-stage" style="font:700 14px/1.4 system-ui,sans-serif;margin:2px 0"></div>
        <div id="ab-sub" style="color:#9adbb8;margin:2px 0 4px;white-space:pre-wrap"></div>
+       <div id="ab-chips" style="margin:0 0 6px"></div>
        <a id="ab-details" style="color:#7fae95;cursor:pointer;text-decoration:underline;font-size:11px"></a>
        <div id="ab-log" style="display:none;margin-top:4px"></div>`;
     document.documentElement.appendChild(overlay);
+    window.addEventListener("resize", placeOverlay);
     logBox = overlay.querySelector("#ab-log");
     const details = overlay.querySelector("#ab-details");
     details.textContent = tx("details ▾", "বিস্তারিত ▾");
@@ -76,7 +95,7 @@
     };
     overlay.querySelector("#ab-close").onclick = () => { aborted = true; sirenOff(); overlay.remove(); };
     overlay.querySelector("#ab-hide").onclick = () => {
-      for (const id of ["ab-stage", "ab-sub", "ab-details", "ab-log"]) {
+      for (const id of ["ab-stage", "ab-sub", "ab-chips", "ab-details", "ab-log"]) {
         const el = overlay.querySelector("#" + id);
         if (el) el.style.visibility = el.style.visibility === "hidden" ? "" : "hidden";
       }
@@ -90,7 +109,8 @@
       wait: [tx("⏳ Waiting for release time…", "⏳ টিকিট ছাড়ার সময়ের অপেক্ষায়…"), "#ffd166"],
       search: [tx("🔎 Searching for your train…", "🔎 ট্রেন খোঁজা হচ্ছে…"), "#9adbb8"],
       found: [tx("✅ SEATS OPEN — click BOOK NOW!", "✅ সিট খুলেছে — BOOK NOW চাপুন!"), "#6fe3a5"],
-      seatmap: [tx("🪑 Pick the highlighted seats", "🪑 হাইলাইট করা সিটগুলো বাছুন"), "#6fe3a5"],
+      seatmap: [tx("🪑 Pick the seats ringed in blue", "🪑 নীল দাগের সিটগুলো বাছুন"), "#6fe3a5"],
+      coachfull: [tx("⛔ No free seat in this coach", "⛔ এই বগিতে খালি সিট নেই"), "#ffd166"],
       fail: [tx("❌ Did not succeed — open details", "❌ হয়নি — বিস্তারিত দেখুন"), "#ff6b6b"],
       stopped: [tx("■ Stopped", "■ থামানো হয়েছে"), "#ff6b6b"],
     };
@@ -98,6 +118,57 @@
     const el = overlay.querySelector("#ab-stage");
     el.textContent = text;
     el.style.color = color;
+    if (stage !== "seatmap" && stage !== "coachfull") showChips([]);
+  }
+
+  function setSub(text, color = "#d8ffe9") {
+    const sub = overlay.querySelector("#ab-sub");
+    sub.textContent = text;
+    sub.style.color = color;
+  }
+
+  // Seat chips scroll to the seat and make it bounce; selecting it stays the
+  // user's click. Coach chips are labels only.
+  function showChips(items) {
+    const box = overlay.querySelector("#ab-chips");
+    box.innerHTML = "";
+    for (const it of items) {
+      const c = document.createElement(it.el ? "button" : "span");
+      c.className = it.el ? "ab-chip" : "ab-chip ab-chip-coach";
+      c.textContent = it.label;
+      if (it.el) {
+        c.title = tx("Show this seat", "সিটটি দেখান");
+        c.onclick = () => {
+          it.el.scrollIntoView({ behavior: "smooth", block: "center" });
+          it.el.classList.remove("ab-flash");
+          void it.el.offsetWidth;
+          it.el.classList.add("ab-flash");
+        };
+      }
+      box.appendChild(c);
+    }
+  }
+
+  // Dock beside what the user is working on (the seat map or the train card)
+  // when there's room to its left; otherwise keep the bottom-right corner so
+  // the box never covers the seats.
+  let dockAnchor = null;
+  function placeOverlay() {
+    if (!overlay) return;
+    const W = 300;
+    const r = dockAnchor?.isConnected ? dockAnchor.getBoundingClientRect() : null;
+    const st = overlay.style;
+    if (r && r.width && r.left >= W + 28) {
+      Object.assign(st, { width: W + "px", left: Math.max(12, r.left - W - 20) + "px", top: "50%",
+        transform: "translateY(-50%)", right: "auto", bottom: "auto", maxHeight: "75vh" });
+    } else {
+      Object.assign(st, { width: "340px", left: "auto", top: "auto", transform: "none",
+        right: "12px", bottom: "12px", maxHeight: "50vh" });
+    }
+  }
+
+  function setHot(on) {
+    overlay?.classList.toggle("ab-hot", on);
   }
 
   // Remember how each run ended, for the popup's "Recent runs" list.
@@ -311,6 +382,9 @@
           const btn = box?.querySelector(".book-now-btn");
           if (btn) {
             btn.classList.add("ab-pulse");
+            dockAnchor = card;
+            setHot(true);
+            placeOverlay();
             box.scrollIntoView({ behavior: "smooth", block: "center" });
             btn.addEventListener("click", () => btn.classList.remove("ab-pulse"), { once: true });
             return true;
@@ -324,11 +398,19 @@
 
   // Outlines the best free seats in the seat map the user opened.
   let lastSuggestion = "";
+  function seatMapBox(btns) {
+    let el = btns[0].parentElement;
+    while (el && !btns.every((b) => el.contains(b))) el = el.parentElement;
+    return el;
+  }
+
   function suggestSeats() {
     const BAD = /booked|hidden|selected|progress|blocked|disable|reserved/i;
     const btns = [...document.querySelectorAll("button.btn-seat")]
       .filter((b) => /^[A-Z]{1,5}-\d{1,3}$/.test((b.textContent || "").trim()));
     if (btns.length === 0) return;
+    injectStyles();
+    ensureOverlay();
     for (const b of document.querySelectorAll(".ab-suggest")) b.classList.remove("ab-suggest");
 
     const seats = btns.map((b) => ({
@@ -341,36 +423,53 @@
     );
     for (const s of picked) s.el.classList.add("ab-suggest");
 
-    // Coach hint from the "Select Coach" dropdown ("JHA - 15 Seat(s)").
-    let coachHint = "";
-    const sel = [...document.querySelectorAll("select")].find((s) =>
-      [...s.options].some((o) => /^[A-Z]{1,5}\s*-\s*\d+\s*Seat/i.test(o.textContent.trim())));
+    // Coaches from the "Select Coach" dropdown ("JHA - 15 Seat(s)"). The
+    // site's count also includes seats someone else is paying for.
+    let coaches = [], current = "";
+    const sel = [...document.querySelectorAll("select")].find((x) =>
+      [...x.options].some((o) => /^[A-Z]{1,5}\s*-\s*\d+\s*Seat/i.test(o.textContent.trim())));
     if (sel) {
-      const prio = (cfg.preferredCoaches || "").split(",").map((c) => c.trim().toUpperCase()).filter(Boolean);
-      const coaches = [...sel.options]
+      coaches = [...sel.options]
         .map((o) => o.textContent.trim().match(/^([A-Z]{1,5})\s*-\s*(\d+)/i))
         .filter(Boolean)
         .map((m) => ({ name: m[1].toUpperCase(), free: +m[2] }))
         .filter((c) => c.free > 0);
-      const best = coaches.find((c) => prio.includes(c.name)) ||
-        coaches.sort((a, b) => b.free - a.free)[0];
-      const current = (sel.selectedOptions[0]?.textContent.trim().match(/^([A-Z]{1,5})/i) || [])[1]?.toUpperCase();
-      if (best && current && best.name !== current) {
-        coachHint = tx(`\n👉 Fuller coach: ${best.name} (${best.free} free) — switch in "Select Coach"`,
-                       `\n👉 বেশি খালি বগি: ${best.name} (${best.free}টি খালি) — "Select Coach" থেকে বদলান`);
-      }
+      current = (sel.selectedOptions[0]?.textContent.trim().match(/^([A-Z]{1,5})/i) || [])[1]?.toUpperCase() || "";
     }
+    const prio = (cfg.preferredCoaches || "").split(",").map((c) => c.trim().toUpperCase()).filter(Boolean);
+    const others = coaches.filter((c) => c.name !== current).sort((a, b) => b.free - a.free);
+    const best = others.find((c) => prio.includes(c.name)) || others[0];
 
-    const signature = picked.map((s) => s.seat_number).join(",") + "|" + coachHint;
+    dockAnchor = seatMapBox(btns);
+    setHot(true);
+    placeOverlay();
+
+    const signature = picked.map((s) => s.seat_number).join(",") + "|" + current + "|" + others.map((c) => c.name + c.free).join(",");
     if (signature === lastSuggestion) return;
     lastSuggestion = signature;
 
-    setStage("seatmap");
     if (picked.length) {
-      ok(tx(`Suggested: ${picked.map((s) => s.seat_number).join(", ")} — click them, then CONTINUE PURCHASE.`,
-            `পরামর্শ: ${picked.map((s) => s.seat_number).join(", ")} — এগুলো চাপুন, তারপর CONTINUE PURCHASE।`) + coachHint);
+      const names = picked.map((s) => s.seat_number).join(", ");
+      ok(tx(`Suggested: ${names}`, `পরামর্শ: ${names}`));
+      setStage("seatmap");
+      let text = tx("Click these seats on the map, then CONTINUE PURCHASE:", "ম্যাপে এই সিটগুলো চাপুন, তারপর CONTINUE PURCHASE:");
+      if (best && best.free > picked.length * 3 && !prio.includes(current)) {
+        text += tx(`\n👉 Emptier coach: ${best.name} (${best.free} free)`, `\n👉 বেশি খালি বগি: ${best.name} (${best.free}টি খালি)`);
+      }
+      setSub(text);
+      showChips(picked.map((s) => ({ label: s.seat_number, el: s.el })));
+    } else if (others.length) {
+      warn(tx(`No free seat in ${current || "this coach"}.`, `${current || "এই বগি"}-তে খালি সিট নেই।`));
+      setStage("coachfull");
+      setSub(tx(`Pick one of these in "Select Coach" (counts may include seats being paid for):`,
+                `"Select Coach" থেকে এগুলোর একটি বাছুন (সংখ্যায় পেমেন্ট চলা সিটও থাকতে পারে):`), "#ffd166");
+      showChips(others.slice(0, 6).map((c) => ({ label: `${c.name} · ${c.free}` })));
     } else {
-      warn(tx("No free seats in this coach — pick another coach.", "এই বগিতে খালি সিট নেই — অন্য বগি বাছুন।") + coachHint);
+      warn(tx("No free seats in any coach of this class.", "এই ক্লাসের কোনো বগিতে খালি সিট নেই।"));
+      setStage("coachfull");
+      setSub(tx("Every coach in this class is taken or being paid for. Green “In Progress” seats can come back if a payment fails — keep this page open and watch, or try another class.",
+                "এই ক্লাসের সব সিট বিক্রি হয়েছে বা পেমেন্ট চলছে। সবুজ \"In Progress\" সিট পেমেন্ট ব্যর্থ হলে আবার খালি হতে পারে — পেজটা খোলা রেখে দেখুন, অথবা অন্য ক্লাস চেষ্টা করুন।"), "#ffd166");
+      showChips([]);
     }
   }
 

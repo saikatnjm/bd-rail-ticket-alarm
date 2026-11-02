@@ -222,6 +222,21 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   await launchMission(runAt, { nextAt: rest[0] || null, scheduled: true });
 });
 
+// Content scripts only start when a page loads, so a ticket tab that was
+// open before this extension was installed or reloaded has none. Add it.
+async function ensureContentScript(tabId) {
+  try { if (await chrome.tabs.sendMessage(tabId, { type: "ping" })) return true; } catch (_) {}
+  for (const file of ["rail-data.js", "content.js"]) {
+    try { await chrome.scripting.executeScript({ target: { tabId }, files: [file] }); } catch (_) {}
+  }
+  try { return !!(await chrome.tabs.sendMessage(tabId, { type: "ping" })); } catch (_) { return false; }
+}
+
+chrome.runtime.onInstalled.addListener(async () => {
+  const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
+  for (const t of tabs) ensureContentScript(t.id);
+});
+
 async function openSite() {
   const tabs = await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
   if (tabs.length > 0) {
@@ -256,6 +271,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         // A test run must not cancel the real ARM.
         if (msg.scheduled) await disarm();
         sendResponse({ ok: true });
+        break;
+      }
+      case "ensureTab": {
+        sendResponse({ ok: await ensureContentScript(msg.tabId) });
         break;
       }
       case "openSite": {

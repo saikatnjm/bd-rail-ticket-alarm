@@ -136,6 +136,11 @@ Opens (or reuses) the eticket.railway.gov.bd tab shortly before the release time
 Plays the alarm sound. Browsers block audio in tabs the user hasn't clicked, and the ticket tab is opened automatically at release time, so the sound plays from an offscreen document.
 ```
 
+`scripting`
+```
+Adds the extension's own content script to an eticket.railway.gov.bd tab that was already open before the extension was installed or updated, so the login check and train list work without the user reloading the page. Used only on that site, only with the extension's packaged files.
+```
+
 Host permissions (`https://eticket.railway.gov.bd/*`, `https://railspaapi.shohoz.com/*`)
 ```
 The extension only works on the Bangladesh Railway ticket site. It checks train availability through the site's own search API using the user's existing login, highlights the BOOK NOW button and outlines suggested seats on the site's pages. No other sites are accessed.

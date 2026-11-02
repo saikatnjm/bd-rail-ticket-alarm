@@ -341,7 +341,7 @@ async function loadTrains({ auto = false } = {}) {
     if (!dates.includes(d)) dates.push(d);
   }
   try {
-    const res = await chrome.tabs.sendMessage(tabs[0].id, {
+    const res = await sendToTab(tabs[0].id, {
       type: "listTrains",
       from: $("fromCity").value.trim(),
       to: $("toCity").value.trim(),
@@ -472,8 +472,19 @@ function applyLogin(res) {
   renderLogin();
 }
 
+// Message the ticket tab's content script. If the tab was open before the
+// extension was installed or reloaded it has none yet: add it and retry.
+async function sendToTab(tabId, msg) {
+  try {
+    const r = await chrome.tabs.sendMessage(tabId, msg);
+    if (r !== undefined) return r;
+  } catch (_) {}
+  await chrome.runtime.sendMessage({ type: "ensureTab", tabId });
+  return chrome.tabs.sendMessage(tabId, msg);
+}
+
 async function askTab(tabId) {
-  try { return await chrome.tabs.sendMessage(tabId, { type: "authStatus" }); }
+  try { return await sendToTab(tabId, { type: "authStatus" }); }
   catch (_) { return null; }
 }
 
@@ -565,7 +576,7 @@ $("checkSeats").onclick = async () => {
   const d = fromIso(jd);
   const doj = `${String(d.getDate()).padStart(2, "0")}-${EN[d.getMonth()]}-${d.getFullYear()}`;
   try {
-    const res = await chrome.tabs.sendMessage(tabs[0].id, {
+    const res = await sendToTab(tabs[0].id, {
       type: "checkSeats",
       from: $("fromCity").value.trim(),
       to: $("toCity").value.trim(),
