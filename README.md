@@ -42,13 +42,15 @@ Details and honest limitations: [How it works](https://saikatnjm.github.io/bd-ra
 
 ## Install
 
-1. Download [bd-rail-ticket-alarm-main.zip](https://github.com/saikatnjm/bd-rail-ticket-alarm/archive/refs/heads/main.zip) and unzip it somewhere permanent.
-2. Open `brave://extensions` or `chrome://extensions`, turn on **Developer mode**.
-3. **Load unpacked** → choose the `shohoz-autobook` folder inside `bd-rail-ticket-alarm-main`.
-4. Pin the extension and click 🔔 to open the panel.
+**[⬇ Download bd-rail-ticket-alarm.zip](https://github.com/saikatnjm/bd-rail-ticket-alarm/releases/latest/download/bd-rail-ticket-alarm.zip)** — free, works in Brave, Chrome and Edge on a computer.
 
-Step-by-step with pictures: [English guide](https://saikatnjm.github.io/bd-rail-ticket-alarm/#install) · [বাংলা গাইড](https://saikatnjm.github.io/bd-rail-ticket-alarm/bn.html#install).
-A Chrome Web Store version is planned but not available yet.
+1. Unzip it. You get a folder called `bd-rail-ticket-alarm` — keep it somewhere permanent.
+2. Open `brave://extensions` (or `chrome://extensions`) and turn on **Developer mode** (top-right).
+3. Press **Load unpacked** and choose the `bd-rail-ticket-alarm` folder.
+4. Click 🧩, pin **BD Rail Ticket Alarm**, then click 🔔 to open the panel.
+
+Step-by-step with pictures: [English](https://saikatnjm.github.io/bd-rail-ticket-alarm/#install) · [বাংলা](https://saikatnjm.github.io/bd-rail-ticket-alarm/bn.html#install).
+One-click install from the Chrome Web Store is coming soon.
 
 ## Repository layout
 

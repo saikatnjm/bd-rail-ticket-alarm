@@ -1,0 +1,25 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1000px; height: 560px; overflow: hidden; font-family: system-ui, "Segoe UI", Roboto, sans-serif; background: #e9ecef; }
+.win { position: absolute; inset: 18px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+.chrome { height: 46px; background: #f1f3f4; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid #dadce0; }
+.dots i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; background: #c4c7c5; }
+.url { flex: 1; height: 30px; background: #fff; border: 1px solid #dadce0; border-radius: 16px; display: flex; align-items: center; padding: 0 14px; font-size: 15px; color: #202124; }
+.icons { display: flex; gap: 12px; color: #5f6368; font-size: 18px; }
+.page { padding: 18px 26px; }
+.bar { display: flex; align-items: center; justify-content: space-between; }
+.bar h1 { margin: 0; font-size: 22px; font-weight: 600; color: #202124; }
+.toggle { display: flex; align-items: center; gap: 10px; font-size: 15px; color: #202124; }
+.sw { width: 38px; height: 20px; border-radius: 10px; background: #1a73e8; position: relative; }
+.sw::after { content: ""; position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; }
+.sw.off { background: #bdc1c6; }
+.sw.off::after { right: auto; left: 2px; }
+.btns { display: flex; gap: 10px; margin-top: 16px; }
+.btn { border: 1px solid #dadce0; border-radius: 6px; padding: 8px 14px; font-size: 14px; color: #1a73e8; background: #fff; font-weight: 600; }
+.ring { position: absolute; border: 5px solid #e8590c; border-radius: 14px; box-shadow: 0 0 0 6px rgba(232,89,12,.25); }
+.tag { position: absolute; background: #e8590c; color: #fff; font: 800 20px/1.2 system-ui, sans-serif; padding: 8px 14px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+.step { position: absolute; left: 34px; bottom: 30px; background: #0e1b14; color: #fff; font: 700 18px/1.3 system-ui, sans-serif; padding: 10px 16px; border-radius: 10px; }
+.step b { color: #6fe3a5; }
+.card { margin-top: 22px; width: 380px; border: 1px solid #dadce0; border-radius: 10px; padding: 14px; display: flex; gap: 12px; align-items: center; }
+.card img { width: 40px; height: 40px; }
+.card .t { font-weight: 600; color: #202124; }
+.card .d { color: #5f6368; font-size: 13px; }

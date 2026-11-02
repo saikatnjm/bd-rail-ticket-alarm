@@ -36,7 +36,7 @@ OTP and payment.
 
 1. Open `brave://extensions` (or `chrome://extensions`)
 2. Turn on **Developer mode** (top-right)
-3. Click **Load unpacked** → select this `shohoz-autobook` folder
+3. Click **Load unpacked** → select this folder (the one with `manifest.json` in it — `bd-rail-ticket-alarm` if you downloaded the release zip)
 4. Pin the 🚆 icon. Click it to open the panel.
 
 > Chrome closes the small popup when you click outside it.

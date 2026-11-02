@@ -56,7 +56,7 @@ cd "/run/media/saikat/Software (SSD)/claude/saikat/bd_train_chrome_extension" &&
 - **Create a release** (so people can download a ready zip):
   1. Run `./build-zip.sh` (see Part 2, step 1).
   2. Repo → **Releases → Draft a new release** → tag `v1.0.0` → title `v1.0.0`.
-  3. Attach `webstore/bd-rail-ticket-alarm-1.0.0.zip` → **Publish release**.
+  3. Attach `webstore/bd-rail-ticket-alarm.zip` (keep that exact name — the docs link to `releases/latest/download/bd-rail-ticket-alarm.zip`) → **Publish release**.
 
 ---
 

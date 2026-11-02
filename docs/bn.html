@@ -67,7 +67,8 @@
   <p>টিকিট ছাড়ার সেকেন্ডেই এটি আপনার ট্রেন খোঁজে, জোরে অ্যালার্ম বাজায়, আর সাইটে BOOK NOW বোতাম ও ভালো সিটগুলো
      জ্বালিয়ে দেখিয়ে দেয়। চাপবেন আপনি, পেমেন্টও আপনি। আপনার অজান্তে কিছুই কেনা হয় না।</p>
   <div class="btns">
-    <a class="btn" href="#install">ইনস্টল</a>
+    <a class="btn" href="https://github.com/saikatnjm/bd-rail-ticket-alarm/releases/latest/download/bd-rail-ticket-alarm.zip">⬇ ফ্রি ডাউনলোড</a>
+    <a class="btn ghost" href="#install">কীভাবে ইনস্টল করবেন</a>
     <a class="btn ghost" href="#use">কীভাবে ব্যবহার করবেন</a>
     <a class="btn ghost" href="index.html" lang="en">Read in English</a>
   </div>
@@ -116,31 +117,35 @@
 </section>
 
 <section id="install">
-  <h2>ইনস্টল</h2>
-  <p>প্রায় দুই মিনিট লাগে। ব্রাউজারের <i>Developer mode</i> দিয়ে সরাসরি GitHub থেকে ইনস্টল করবেন —
-     ওয়েব স্টোরে না থাকা এক্সটেনশনের জন্য এটাই স্বাভাবিক নিয়ম, এতে কোনো তথ্য কোথাও যায় না।</p>
+  <h2>ইনস্টল (প্রায় ২ মিনিট)</h2>
+  <div class="note"><b>Chrome Web Store থেকে এক ক্লিকে ইনস্টল শিগগিরই আসছে।</b> ততদিন সরাসরি GitHub থেকে ইনস্টল করুন —
+    একই এক্সটেনশন, ফ্রি, প্রায় দুই মিনিট লাগে। কম্পিউটারের Brave, Google Chrome আর Microsoft Edge-এ চলে।</div>
+  <p><a class="btn" href="https://github.com/saikatnjm/bd-rail-ticket-alarm/releases/latest/download/bd-rail-ticket-alarm.zip">⬇ bd-rail-ticket-alarm.zip ডাউনলোড করুন</a></p>
   <ol class="steps">
-    <li><a href="https://github.com/saikatnjm/bd-rail-ticket-alarm/archive/refs/heads/main.zip">bd-rail-ticket-alarm-main.zip</a> <b>ডাউনলোড</b> করে আনজিপ করুন
-        (রাইট-ক্লিক → <i>Extract here</i>)। ফোল্ডারটি স্থায়ী কোনো জায়গায় রাখুন, যেমন <code>Documents</code>।</li>
-    <li>Brave-এ <code>brave://extensions</code>, বা Chrome-এ <code>chrome://extensions</code> খুলুন।</li>
-    <li>ডানদিকে উপরে <b>Developer mode</b> চালু করুন।</li>
-    <li><b>Load unpacked</b> চেপে <code>bd-rail-ticket-alarm-main</code>-এর ভেতরের <code>shohoz-autobook</code> ফোল্ডারটি বাছুন —
-        যেটার ভেতরে <code>manifest.json</code> আছে।</li>
-    <li>টুলবারের পাজল-আইকনে ক্লিক করে <b>BD Rail Ticket Alarm</b> পিন করুন। 🔔 চাপলে প্যানেল খুলবে।</li>
+    <li><b>আনজিপ করুন।</b> ডাউনলোড করা ফাইলে রাইট-ক্লিক → <i>Extract All</i> (Windows), বা ডাবল-ক্লিক (Mac, Linux)।
+        <code>bd-rail-ticket-alarm</code> নামে একটি ফোল্ডার পাবেন। ফোল্ডারটি স্থায়ী জায়গায় রাখুন, যেমন <code>Documents</code> — এমন ফোল্ডারে নয় যা আপনি মাঝে মাঝে খালি করেন।</li>
+    <li><b>এক্সটেনশন পেজ খুলে Developer mode চালু করুন।</b> অ্যাড্রেস বারে <code>brave://extensions</code> লিখে Enter চাপুন
+        (Chrome: <code>chrome://extensions</code>, Edge: <code>edge://extensions</code>)। ডানদিকে উপরে <b>Developer mode</b> চালু করুন।
+      <figure><img src="img/install-1.png" alt="ব্রাউজারের এক্সটেনশন পেজ, Developer mode সুইচ দাগানো" loading="lazy"></figure></li>
+    <li><b>ফোল্ডারটি লোড করুন।</b> <b>Load unpacked</b> চেপে <code>bd-rail-ticket-alarm</code> ফোল্ডারটি বাছুন — ফোল্ডার, .zip ফাইল নয়।
+      <figure><img src="img/install-2.png" alt="Load unpacked বোতাম আর ফোল্ডার বাছাইয়ের ঘর, bd-rail-ticket-alarm ফোল্ডার বাছা" loading="lazy"></figure></li>
+    <li><b>পিন করুন।</b> অ্যাড্রেস বারের পাশের 🧩 পাজল আইকনে ক্লিক করে <b>BD Rail Ticket Alarm</b>-এর পাশের 📌 চাপুন। প্যানেল খুলতে 🔔 আইকনে ক্লিক করুন।
+      <figure><img src="img/install-3.png" alt="এক্সটেনশন মেনু, BD Rail Ticket Alarm-এর পাশের পিন বোতাম দাগানো" loading="lazy"></figure></li>
   </ol>
-  <div class="note">ফোল্ডারটি জায়গামতো রেখে দিন। সরালে, নাম বদলালে বা মুছলে ব্রাউজার এক্সটেনশন আর তার সেটিংস হারিয়ে ফেলবে।
-    চালু করার সময় Brave/Chrome "developer mode extensions" নিয়ে একটা নোটিশ দেখাতে পারে — এটা স্বাভাবিক, X চাপুন।</div>
+  <details><summary>Developer mode কি নিরাপদ?</summary>
+    <p>হ্যাঁ। এটা শুধু স্টোরের বদলে আপনার কম্পিউটারের একটি ফোল্ডার থেকে এক্সটেনশন যোগ করতে দেয়, অন্য কোনো সেটিং বদলায় না।
+       Chrome চালু করার সময় "developer mode extensions" নিয়ে একটা নোটিশ দেখাতে পারে — ✕ দিয়ে বন্ধ করুন, <i>Disable</i> চাপবেন না।
+       যে কোড ইনস্টল করছেন, সেটাই <a href="https://github.com/saikatnjm/bd-rail-ticket-alarm">GitHub</a>-এ পড়ে দেখা যায়।</p></details>
+  <details><summary>ফোল্ডারটি জায়গামতো রাখুন</summary>
+    <p>ব্রাউজার ওই ফোল্ডার থেকেই এক্সটেনশন চালায়। সরালে, নাম বদলালে বা মুছলে এক্সটেনশন আর তার সেটিংস হারিয়ে যাবে।</p></details>
 
   <h3>নতুন ভার্সনে আপডেট</h3>
   <ol class="steps">
-    <li>zip আবার ডাউনলোড করে আনজিপ করুন।</li>
-    <li>নতুন ফাইলগুলো পুরনো <code>shohoz-autobook</code> ফোল্ডারের <b>ওপরে</b> কপি করুন (একই জায়গায়, সব রিপ্লেস)।</li>
+    <li>একই বোতাম থেকে zip আবার ডাউনলোড করে আনজিপ করুন।</li>
+    <li>নতুন <code>bd-rail-ticket-alarm</code> ফোল্ডারের ভেতরের সব ফাইল পুরনো ফোল্ডারের <b>ওপরে</b> কপি করুন (একই জায়গায়, সব রিপ্লেস)।</li>
     <li><code>brave://extensions</code>-এ এক্সটেনশনের কার্ডে ↻ চাপুন। সেটিংস আর সেভ করা ট্রিপ থেকে যাবে।</li>
   </ol>
   <p>আপডেটের পর <b>ARM</b> এখনো লাল আছে কি না দেখে নিন — রিলোডে চালু থাকা অ্যালার্ম মুছে যেতে পারে।</p>
-
-  <h3>Chrome Web Store</h3>
-  <p>ওয়েব স্টোর ভার্সন (নিজে থেকে আপডেট হবে) পরিকল্পনায় আছে, এখনো আসেনি। ততদিন উপরের নিয়মে ইনস্টল করুন।</p>
 </section>
 
 <section id="use">

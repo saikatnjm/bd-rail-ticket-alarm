@@ -34,7 +34,7 @@
 
 1. খুলুন `brave://extensions` (বা `chrome://extensions`)
 2. ডানদিকে উপরে **Developer mode** চালু করুন
-3. **Load unpacked** চেপে এই `shohoz-autobook` ফোল্ডারটি বাছুন
+3. **Load unpacked** চেপে এই ফোল্ডারটি বাছুন (যেটার ভেতরে `manifest.json` আছে — রিলিজের zip থেকে নামালে `bd-rail-ticket-alarm`)
 4. 🚆 আইকনটি পিন করুন। ক্লিক করলে প্যানেল খুলবে।
 
 > পপআপের বাইরে ক্লিক করলে Chrome সেটি বন্ধ করে দেয়।
