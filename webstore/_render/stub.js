@@ -1,7 +1,7 @@
 // Fake extension APIs so popup.html can render outside the browser for store screenshots.
 (function () {
   const q = new URLSearchParams(location.search);
-  let rel = new Date(2026, 10, 3, 0, 0, 0).getTime();
+  let rel = new Date(2026, 10, 3, 8, 0, 0).getTime();
   if (rel < Date.now()) rel = Date.now() + (1 * 3600 + 54 * 60 + 12) * 1000;
   const rel2 = new Date(rel); rel2.setHours(14, 0, 0, 0);
   const store = {

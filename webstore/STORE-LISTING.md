@@ -30,7 +30,7 @@ Never miss the 10-day ticket release again.
 BD Rail Ticket Alarm watches for your train on eticket.railway.gov.bd at the exact second its tickets go on sale. When your class has online seats, it rings a loud alarm, jumps to your train and makes the BOOK NOW button glow. In the seat map it outlines good seats for you. You click, you pay — nothing is booked behind your back.
 
 WHAT IT DOES
-• Pick your travel date on a calendar — it works out the opening day (10 days before) and checks at 12 AM, then again at the train's zone time (8 AM or 2 PM) if needed
+• Pick your travel date on a calendar — it works out the opening day (10 days before) and checks at 8 AM, when tickets open — plus 2 PM for East trains during Eid
 • Big countdown, plus reminders a day before and an hour before
 • At release time it checks for your train about once a second
 • Loud alarm the moment seats open — keeps ringing until you click the page

@@ -19,13 +19,14 @@ const DEFAULTS = {
   preferredCoaches: "",      // comma-separated coach prefixes, e.g. "THA,TA"
   preferredSeats: "",        // comma-separated exact seat numbers, e.g. "THA-21,THA-22"
   journeyDate: "",           // ISO yyyy-mm-dd, picked on the popup calendar
-  triggerTime: "auto",       // "auto" = 12 AM on the opening day, then the train's zone time; or explicit "HH:MM:SS"
+  triggerTime: "auto",       // "auto" = 8 AM on the opening day, then the train's zone time if later; or explicit "HH:MM:SS"
   startLeadMs: 500,          // tiny head start so the first search lands ~at the release second
   pollIntervalMs: 700,
   maxWaitMinutes: 5,
 };
 
 const SALE_WINDOW_DAYS = 10; // BD Railway sells tickets up to 10 days ahead
+const NORMAL_OPEN = "08:00:00"; // ordinary-day opening time for every train
 
 async function getConfig() {
   const stored = await chrome.storage.local.get("config");
@@ -74,13 +75,12 @@ function atTime(day, timeStr) {
   return t;
 }
 
-// Checks to run for this journey date D. Its sale opens on D - 10 days, but
-// on ordinary days the new date can appear at midnight (the site rolls its
-// bookable dates over at 00:00), while the railway publishes per-zone times
-// (EAST 2 PM, WEST 8 AM). "auto" covers both: a short check at 12 AM and,
-// only if that finds nothing, another at the zone time. An explicit
-// triggerTime is a single check. A date already on sale gets one check at
-// the next zone time.
+// Checks to run for this journey date D. Its sale opens on D - 10 days: on
+// ordinary days at 8 AM for every train; during Eid the railway splits it by
+// zone (WEST 8 AM, EAST 2 PM). "auto" checks at 8 AM and, only if that finds
+// nothing and the train's zone time is later, again at the zone time. An
+// explicit triggerTime is a single check. A date already on sale gets one
+// check at the next 8 AM.
 async function stagesForJourney(cfg) {
   if (!cfg.journeyDate) return [];
   const openDay = parseIso(cfg.journeyDate);
@@ -91,10 +91,9 @@ async function stagesForJourney(cfg) {
     return [t.getTime() > soon ? t.getTime() : nextTrigger(cfg.triggerTime).getTime()];
   }
   const zone = await resolveZoneTime(cfg);
-  const stages = [atTime(openDay, "00:00:00"), atTime(openDay, zone)]
-    .map((t) => t.getTime())
-    .filter((t) => t > soon);
-  return stages.length ? stages : [nextTrigger(zone).getTime()];
+  const times = zone > NORMAL_OPEN ? [NORMAL_OPEN, zone] : [NORMAL_OPEN];
+  const stages = times.map((t) => atTime(openDay, t).getTime()).filter((t) => t > soon);
+  return stages.length ? stages : [nextTrigger(NORMAL_OPEN).getTime()];
 }
 
 async function setLaunchAlarm(at) {

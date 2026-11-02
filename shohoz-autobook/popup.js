@@ -8,6 +8,7 @@ const PRESET_FIELDS = [
   "preferredCoaches", "preferredSeats",
 ];
 const SALE_WINDOW_DAYS = 10;   // BD Railway sells up to 10 days ahead
+const NORMAL_OPEN = "08:00:00"; // ordinary-day opening time for every train
 const MAX_PLAN_DAYS = 30;      // how far ahead the calendar lets you plan
 
 const $ = (id) => document.getElementById(id);
@@ -164,7 +165,11 @@ function resolveReleaseTime() {
   if (override && override !== "auto") {
     return { time: override, label: fmtTime12(override), zoneLabel: fmtTime12(override), src: t("srcManual"), manual: true };
   }
-  const auto = (time, src) => ({ time, zoneLabel: fmtTime12(time), label: t("twoStage", { t: fmtTime12(time) }), src });
+  // Auto: 8 AM for every train; a later zone time (EAST 2 PM, used during Eid) is a backup check.
+  const auto = (time, src) => ({
+    time, zoneLabel: fmtTime12(NORMAL_OPEN), backupLabel: fmtTime12(time), src,
+    label: time > NORMAL_OPEN ? t("twoStage", { t8: fmtTime12(NORMAL_OPEN), t: fmtTime12(time) }) : fmtTime12(NORMAL_OPEN),
+  });
   const info = trainReleaseInfo($("trainQuery").value.trim() || $("trainSelect").value);
   if (info) return auto(info.time, t("srcZone", { zone: info.zone }));
   const times = routeTrains
@@ -175,16 +180,15 @@ function resolveReleaseTime() {
   return auto("08:00:00", t("srcDefault"));
 }
 
-// Same rule as the background: the date opens on D - 10, possibly from
-// 12 AM, and the zone time is the railway's published release.
+// Same rule as the background: the date opens on D - 10 at 8 AM; a later
+// zone time (EAST 2 PM, during Eid) is the backup check.
 function saleState(jdIso, rel) {
   const openDay = addDays(day0(fromIso(jdIso)), -SALE_WINDOW_DAYS);
-  const [h, m] = rel.time.split(":").map(Number);
-  const zoneAt = new Date(openDay); zoneAt.setHours(h, m, 0, 0);
+  const at = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); const x = new Date(openDay); x.setHours(h, m, 0, 0); return x.getTime(); };
   const now = Date.now();
-  const firstAt = rel.manual ? zoneAt.getTime() : openDay.getTime();
+  const firstAt = at(rel.manual ? rel.time : NORMAL_OPEN);
   if (firstAt > now) return { state: "later", openDay };
-  if (!rel.manual && zoneAt.getTime() > now) return { state: "today", openDay };
+  if (!rel.manual && rel.time > NORMAL_OPEN && at(rel.time) > now) return { state: "today", openDay };
   return { state: "onSale", openDay };
 }
 
@@ -244,7 +248,7 @@ function refreshFlow() {
   const sale = saleState(jd, rel);
   $("dojPreview").textContent =
     sale.state === "later" ? t("opensLater", { d: dojFmt(d), od: dojFmt(sale.openDay), t: rel.label, src: rel.src })
-    : sale.state === "today" ? t("openingToday", { d: dojFmt(d), t: rel.zoneLabel })
+    : sale.state === "today" ? t("openingToday", { d: dojFmt(d), t: rel.backupLabel })
     : t("onSaleNow", { d: dojFmt(d), t: rel.zoneLabel });
   refreshTrainInfo();
 }
@@ -264,7 +268,9 @@ function refreshTrainInfo() {
     el.style.color = "#ffd166";
     return;
   }
-  let line = t("trainZoneLine", { zone: info.zone, t: info.label });
+  let line = info.time > NORMAL_OPEN
+    ? t("trainZoneLineEid", { zone: info.zone, t: info.label })
+    : t("trainZoneLine", { zone: info.zone });
   const jd = $("journeyDate").value;
   if (jd) {
     const d = day0(fromIso(jd));

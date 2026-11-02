@@ -508,13 +508,13 @@
     ok(`train: "${cfg.trainQuery || "(first with seats)"}" class: ${cfg.classPriority}`);
 
     // When can this journey date go on sale at the earliest? The opening day
-    // is D - 10; on ordinary days the date can appear from 12 AM, so
-    // anything before that midnight is certainly too early.
+    // is D - 10 and no train opens before 8 AM (the date itself shows up at
+    // 12 AM, but with no trains), so anything earlier is too early.
     let releaseAt = null;
     try {
       const M = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
       const [dd, mon, yyyy] = doj.split("-");
-      releaseAt = new Date(+yyyy, M[mon], +dd - 10, 0, 0, 0);
+      releaseAt = new Date(+yyyy, M[mon], +dd - 10, 8, 0, 0);
       if (releaseAt.getTime() > Date.now())
         warn(`${doj} can open from ${releaseAt.toLocaleString()} at the earliest.`);
       if (releaseAt.getTime() > mission.runAt + (cfg.maxWaitMinutes || 5) * 60_000) {

@@ -27,7 +27,7 @@ It rings the moment your train opens and takes you straight to BOOK NOW and the 
 
 ## Features
 
-- Calendar date picking — works out the opening day (10 days before) and checks at 12 AM, then at the zone time (WEST 8 AM / EAST 2 PM) if needed
+- Calendar date picking — works out the opening day (10 days before) and checks at 8 AM, when tickets open (plus 2 PM for East trains, the Eid-time opening)
 - Countdown, plus reminders 1 day and 1 hour before
 - Checks for your train at the exact release second, about once a second
 - Loud alarm when seats open; scrolls to your train and makes BOOK NOW glow
