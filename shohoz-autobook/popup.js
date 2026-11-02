@@ -11,6 +11,13 @@ const SALE_WINDOW_DAYS = 10;   // BD Railway sells up to 10 days ahead
 const MAX_PLAN_DAYS = 30;      // how far ahead the calendar lets you plan
 
 const $ = (id) => document.getElementById(id);
+
+// Classic or glass look. Kept in this extension's localStorage so it applies
+// before the first paint; the panel works the same either way.
+function getTheme() {
+  try { return localStorage.getItem("theme") === "glass" ? "glass" : "classic"; } catch (_) { return "classic"; }
+}
+document.body.classList.toggle("glass", getTheme() === "glass");
 const statusBox = $("status");
 function setStatus(msg) { statusBox.textContent = msg; }
 
@@ -24,6 +31,8 @@ function t(key, vars = {}) {
 
 function applyLang() {
   $("langToggle").textContent = LANG === "en" ? "বাং" : "EN";
+  $("themeToggle").textContent = getTheme() === "glass" ? "◻" : "✨";
+  $("themeToggle").title = t(getTheme() === "glass" ? "themeToClassic" : "themeToGlass");
   for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
   for (const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = t(el.dataset.i18nPh);
   const auto = $("triggerTime").querySelector('option[value="auto"]');
@@ -599,6 +608,14 @@ $("langToggle").onclick = async () => {
   LANG = LANG === "en" ? "bn" : "en";
   await saveConfig();
   applyLang();
+};
+
+$("themeToggle").onclick = () => {
+  const next = getTheme() === "glass" ? "classic" : "glass";
+  try { localStorage.setItem("theme", next); } catch (_) {}
+  document.body.classList.toggle("glass", next === "glass");
+  $("themeToggle").textContent = next === "glass" ? "◻" : "✨";
+  $("themeToggle").title = t(next === "glass" ? "themeToClassic" : "themeToGlass");
 };
 
 $("loginCheck").onclick = () => checkLogin(true);

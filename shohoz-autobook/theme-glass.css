@@ -1,0 +1,247 @@
+/* Glass look for the panel, on when <body> has the "glass" class (the ✨ switch). */
+
+body.glass {
+  --g-fill: rgba(255, 255, 255, 0.09);
+  --g-fill-hi: rgba(255, 255, 255, 0.16);
+  --g-edge: rgba(255, 255, 255, 0.28);
+  --g-edge-lo: rgba(255, 255, 255, 0.08);
+  --g-text: #f2fff8;
+  --g-muted: #c6f0dc;
+  --g-accent: #5ff0ae;
+  --g-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --g-gloss: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0) 55%);
+}
+
+body.glass {
+  color: var(--g-text);
+  background:
+    radial-gradient(220px 180px at 12% 8%, rgba(52, 211, 153, 0.55), transparent 70%),
+    radial-gradient(240px 220px at 95% 22%, rgba(56, 189, 248, 0.45), transparent 70%),
+    radial-gradient(260px 240px at 20% 78%, rgba(168, 85, 247, 0.35), transparent 70%),
+    radial-gradient(220px 200px at 90% 95%, rgba(16, 185, 129, 0.45), transparent 70%),
+    linear-gradient(160deg, #06281c 0%, #0a3b2b 45%, #0b2236 100%);
+  background-attachment: fixed;
+}
+
+body.glass h1 {
+  color: #fff;
+  text-shadow: 0 1px 12px rgba(95, 240, 174, 0.45);
+}
+
+body.glass label {
+  color: var(--g-muted);
+}
+
+body.glass .hint,
+body.glass .stepchev {
+  color: rgba(214, 245, 230, 0.75);
+}
+
+body.glass #dojPreview,
+body.glass #trainInfo {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+body.glass input,
+body.glass select,
+body.glass .step,
+body.glass #status,
+body.glass #loginStatus,
+body.glass details,
+body.glass .cal,
+body.glass #nextCard,
+body.glass .minor {
+  background-color: var(--g-fill) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  border: 1px solid var(--g-edge) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.18), var(--g-shadow);
+}
+
+body.glass input,
+body.glass select {
+  border-radius: 11px;
+  color: var(--g-text);
+}
+
+body.glass input::placeholder {
+  color: rgba(214, 245, 230, 0.55);
+}
+
+body.glass input:focus,
+body.glass select:focus {
+  outline: none;
+  border-color: rgba(95, 240, 174, 0.9) !important;
+  box-shadow: 0 0 0 3px rgba(95, 240, 174, 0.25), inset 0 1px 0 rgba(255,255,255,.35);
+}
+
+body.glass select option {
+  background: #0c3326;
+  color: #f2fff8;
+}
+
+body.glass #loginStatus {
+  border-radius: 12px !important;
+}
+
+body.glass .step {
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+body.glass .step::before,
+body.glass #nextCard::before,
+body.glass #arm::before,
+body.glass #stopRun::before,
+body.glass .minor::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 60%;
+  background: var(--g-gloss);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+body.glass .step.foldable:hover {
+  background-color: var(--g-fill-hi) !important;
+  border-color: rgba(95, 240, 174, 0.7) !important;
+}
+
+body.glass .stepnum {
+  background: linear-gradient(180deg, #6ff5b8, #10a96a);
+  color: #04291b;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 6px rgba(16,169,106,.5);
+}
+
+body.glass .step.done .stepnum {
+  background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.12));
+  color: #fff;
+}
+
+body.glass .steplabel {
+  color: #fff;
+}
+
+body.glass .stepsum {
+  color: var(--g-muted);
+}
+
+body.glass .steptick {
+  color: var(--g-accent);
+}
+
+body.glass button:not(.linkbtn):not(.cal-day):not(#langToggle):not(.cal-head button) {
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+body.glass #arm {
+  background: linear-gradient(180deg, #4ee8a3 0%, #13a96b 55%, #0b8a56 100%);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 6px 18px rgba(19, 169, 107, 0.55);
+}
+
+body.glass #arm.armed {
+  background: linear-gradient(180deg, #ff8a80 0%, #e5383b 55%, #b4232a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 6px 18px rgba(229, 56, 59, 0.5);
+}
+
+body.glass #stopRun {
+  background: linear-gradient(180deg, #ff9b8f 0%, #e0453a 55%, #a92a22 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 4px 14px rgba(224, 69, 58, 0.45);
+}
+
+body.glass .minor {
+  color: #effff7;
+}
+
+body.glass .minor:hover:not(:disabled) {
+  background-color: var(--g-fill-hi) !important;
+}
+
+body.glass button:disabled {
+  filter: saturate(0.4);
+}
+
+body.glass #langToggle {
+  background: linear-gradient(180deg, #a7ffd6, #34d399);
+  color: #053524;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 2px 8px rgba(52, 211, 153, 0.5);
+}
+
+body.glass .linkbtn {
+  color: var(--g-muted);
+}
+
+body.glass .linkbtn:hover {
+  color: #fff;
+}
+
+body.glass #nextCard {
+  background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.55), rgba(56, 189, 248, 0.35)) !important;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+body.glass #nextCard .nc-count {
+  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.35);
+}
+
+body.glass .cal {
+  border-radius: 14px;
+}
+
+body.glass .cal-head {
+  background: linear-gradient(180deg, rgba(78, 232, 163, 0.85), rgba(16, 169, 106, 0.85));
+}
+
+body.glass .cal-dow {
+  color: var(--g-accent);
+}
+
+body.glass .cal-day {
+  color: var(--g-text);
+  border-radius: 9px;
+}
+
+body.glass .cal-day:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+body.glass .cal-day:disabled {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+body.glass .cal-day.sel {
+  background: linear-gradient(180deg, #6ff5b8, #10a96a);
+  color: #04291b;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 8px rgba(16, 169, 106, 0.6);
+}
+
+body.glass .cal-day.today {
+  outline: 1px solid rgba(95, 240, 174, 0.9);
+}
+
+body.glass #status {
+  border-radius: 12px;
+  color: #ffe08a;
+}
+
+body.glass details {
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+body.glass summary {
+  color: var(--g-muted);
+}
+
+body.glass #historyBox div {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}

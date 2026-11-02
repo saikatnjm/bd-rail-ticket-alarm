@@ -17,7 +17,7 @@ and lights up the BOOK NOW button and good seats. You click, you pay — nothing
 - Checks for your train at the exact release second, about once a second
 - Loud alarm when seats open; scrolls to your train and makes BOOK NOW glow
 - Outlines good seats: middle of the coach, side by side for 2+ tickets, or your preferred coaches/seats
-- Login indicator, saved trips, recent runs, full English/Bangla UI
+- Login indicator, saved trips, recent runs, full English/Bangla UI, classic or glossy glass look
 
 ## What it never does
 

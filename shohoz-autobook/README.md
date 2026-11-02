@@ -94,6 +94,7 @@ It only outlines. You do the clicking.
 | **Tools → 📊 Check seats now** | Online seat count per class, right now |
 | **Tools → 💾 Save / Saved trips** | Save the current setup, reload it later |
 | **Tools → 🔔 Test alarm sound** | Hear the alarm so you know the volume |
+| **✨ / ◻** (top) | Switch the panel between the classic and the glossy glass look |
 
 ---
 
