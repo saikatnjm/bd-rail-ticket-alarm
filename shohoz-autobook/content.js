@@ -396,6 +396,60 @@
     return false;
   }
 
+  // Picks by where seats sit on the map, not by their numbers. A coach's map
+  // has a wide gap between its two halves; when that gap is near the middle,
+  // the rows beside it count as the middle. Seats for 2+ tickets must share
+  // a row with no aisle between them. Returns null if the map can't be measured.
+  function pickByLayout(seats, count, preferredCoaches) {
+    const coachOf = (s) => s.seat_number.split("-")[0].toUpperCase();
+    const all = seats.map((s) => ({ ...s, r: s.el.getBoundingClientRect() }));
+    if (!all.length || all.some((s) => !s.r.width || !s.r.height)) return null;
+    const median = (a) => { const b = a.slice().sort((x, y) => x - y); return b[b.length >> 1]; };
+    const seatW = median(all.map((s) => s.r.width));
+    const seatH = median(all.map((s) => s.r.height));
+
+    const prio = preferredCoaches.split(",").map((c) => c.trim().toUpperCase()).filter(Boolean);
+    const groups = {};
+    for (const s of all) (groups[coachOf(s)] ||= []).push(s);
+    const order = Object.keys(groups).sort((a, b) => {
+      const pa = prio.indexOf(a), pb = prio.indexOf(b);
+      if (pa >= 0 || pb >= 0) return (pa < 0 ? 1e9 : pa) - (pb < 0 ? 1e9 : pb);
+      return groups[b].filter((s) => s.seat_availability).length - groups[a].filter((s) => s.seat_availability).length;
+    });
+
+    for (const c of order) {
+      const list = groups[c];
+      // Rows: seats whose centres are within half a seat height of each other.
+      const rows = [];
+      for (const s of list.slice().sort((a, b) => a.r.top - b.r.top)) {
+        const y = s.r.top + s.r.height / 2;
+        const row = rows.find((r) => Math.abs(r.y - y) < seatH / 2);
+        if (row) row.seats.push(s); else rows.push({ y, seats: [s] });
+      }
+      if (rows.length < 2) continue;
+      const first = rows[0].y, last = rows[rows.length - 1].y;
+      let center = (first + last) / 2;
+      const steps = rows.slice(1).map((r, i) => ({ d: r.y - rows[i].y, mid: (r.y + rows[i].y) / 2 }));
+      const wide = steps.reduce((a, b) => (b.d > a.d ? b : a));
+      if (wide.d > 1.6 * median(steps.map((g) => g.d)) &&
+          Math.abs(wide.mid - center) <= (last - first) / 6) center = wide.mid;
+
+      const options = [];
+      for (const row of rows) {
+        const free = row.seats.filter((s) => s.seat_availability).sort((a, b) => a.r.left - b.r.left);
+        for (let i = 0; i + count <= free.length; i++) {
+          const block = free.slice(i, i + count);
+          const together = block.every((s, k) => k === 0 || s.r.left - block[k - 1].r.right < seatW * 0.6);
+          if (together) options.push({ block, dist: Math.abs(row.y - center) });
+        }
+      }
+      if (!options.length) continue;
+      options.sort((a, b) => a.dist - b.dist);
+      return options[0].block;
+    }
+    return null;
+  }
+
   // Outlines the best free seats in the seat map the user opened.
   let lastSuggestion = "";
   function seatMapBox(btns) {
@@ -418,9 +472,11 @@
       seat_availability: !BAD.test(b.className) && !b.disabled ? 1 : 0,
       el: b,
     }));
-    const { picked } = scoreAndPick(
-      seats, Number(cfg.seatCount) || 1, cfg.preferredCoaches || "", cfg.preferredSeats || ""
-    );
+    const want = Number(cfg.seatCount) || 1;
+    const favFree = (cfg.preferredSeats || "").split(",").map((c) => c.trim().toUpperCase())
+      .some((f) => seats.some((s) => s.seat_availability && s.seat_number.toUpperCase() === f));
+    const picked = (!favFree && pickByLayout(seats, want, cfg.preferredCoaches || "")) ||
+      scoreAndPick(seats, want, cfg.preferredCoaches || "", cfg.preferredSeats || "").picked;
     for (const s of picked) s.el.classList.add("ab-suggest");
 
     // Coaches from the "Select Coach" dropdown ("JHA - 15 Seat(s)"). The
