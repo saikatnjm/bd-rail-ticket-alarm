@@ -54,7 +54,7 @@
     <tr><th>File</th><th>Runs where</th><th>Job</th></tr>
     <tr><td><code>popup.html</code> / <code>popup.js</code></td><td>The toolbar panel</td><td>Calendar, route/train/seat form, ARM, countdown, saved trips, history, English/Bangla.</td></tr>
     <tr><td><code>background.js</code></td><td>Service worker</td><td>Works out the release time, sets <code>chrome.alarms</code> (main + 1-day + 1-hour reminders), opens the site tab ~75 s early, shows notifications, starts/stops the alarm sound.</td></tr>
-    <tr><td><code>content.js</code></td><td>Inside eticket.railway.gov.bd</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining.</td></tr>
+    <tr><td><code>content.js</code></td><td>Inside eticket.railway.gov.bd</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining, seat-direction guess.</td></tr>
     <tr><td><code>offscreen.html</code> / <code>offscreen.js</code></td><td>Hidden extension page</td><td>Plays the siren (Web Audio oscillator).</td></tr>
     <tr><td><code>rail-data.js</code></td><td>Popup, worker, page</td><td>Bundled station list, train names, and each train's release time and zone (EAST 2 PM / WEST 8 AM).</td></tr>
     <tr><td><code>i18n.js</code></td><td>Popup</td><td>English and Bangla text.</td></tr>
@@ -89,6 +89,7 @@ Seats!  save a short "found" note, send a notification,
 Reload  content.js sees the note → alarm on, scroll to the train, make BOOK NOW glow
 User    clicks BOOK NOW → the site loads the seat map (and runs its own bot check — untouched)
         content.js watches the page (MutationObserver) → outlines the best free seats
+        and guesses which way each faces (⬆ / ⬇ / ⬆→⬇)
         ← zero network requests from the extension in this step
 User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
 </section>
@@ -143,7 +144,7 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
     <tr><td>Stops at the first hit</td><td>As soon as your class shows online seats, searching ends.</td><td>search loop</td></tr>
     <tr><td>Hard time limit</td><td>Gives up after 5 minutes (max 15). Worst case ≈ 300 searches.</td><td><code>maxWaitMinutes</code></td></tr>
     <tr><td>Stops on 401</td><td>A logged-out session isn't retried.</td><td>search loop</td></tr>
-    <tr><td>Seat help is offline</td><td>Seat outlining only reads the page that's already loaded. Switching coaches makes no requests.</td><td><code>suggestSeats()</code></td></tr>
+    <tr><td>Seat help is offline</td><td>Seat outlining only reads the page that's already loaded. Switching coaches makes no requests. The seat-direction guess is worked out from the route and the map, with no lookups.</td><td><code>suggestSeats()</code></td></tr>
     <tr><td>Never touches the bot check</td><td>The seat-map request needs a Turnstile token. The extension never calls it — you open the seat map with your click.</td><td>—</td></tr>
     <tr><td>STOP button everywhere</td><td>Panel and on-page status box both abort immediately.</td><td><code>stopRun</code></td></tr>
   </table></div>
@@ -166,6 +167,11 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
     <li><b>The computer has to be on.</b> A sleeping laptop or a closed browser means the alarm fires late or not at all.</li>
     <li><b>One trip per ARM.</b> One route, date and train. The search asks for your first class; the others in your list are picked from the same results.</li>
     <li><b>Online seats only.</b> The site's numbers mix counter and online quotas; only online seats count.</li>
+    <li><b>Seat direction is a rule of thumb.</b> <code>facingGuess()</code> uses what Bangla travel sites agree on:
+        leaving Dhaka, the higher-numbered half (31–60) faces forward; going to Dhaka, the lower half (1–30).
+        The coach is split at the seat map's middle gap (<code>pickByLayout()</code>), not at a fixed seat number.
+        Trips to or from the Cox's Bazar line flip at Chattogram. Routes that don't start or end in Dhaka get no guess.
+        Nothing official backs this, and a coach attached the other way round makes it wrong.</li>
     <li><b>Seat outlines see one coach at a time</b> — the one on screen. The “fuller coach” hint comes from the coach dropdown.</li>
     <li><b>Clock accuracy is about half a second.</b> Plenty for this, but not millisecond-exact.</li>
     <li><b>Desktop only.</b> No phone browsers.</li>

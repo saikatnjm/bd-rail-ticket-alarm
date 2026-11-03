@@ -1,55 +1,68 @@
-<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><style>body{gap:44px;padding:0 56px}.copy h1{font-size:46px}.copy ul{font-size:20px}</style>
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><style>body{gap:40px;padding:0 48px}.copy h1{font-size:42px}.copy ul{font-size:19px}</style>
 <style>
- .page { position: relative; width: 660px; height: 680px; background: #f4f6f5; color: #1d2b24; font-size: 14px; }
- .bar { background: #fff; border-bottom: 1px solid #dde3e0; padding: 12px 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
- .sel { border: 1px solid #c9d2ce; border-radius: 6px; padding: 5px 10px; font-weight: 500; background: #fff; }
- .grid { display: grid; grid-template-columns: repeat(5, 62px); gap: 6px 8px; padding: 14px 24px; }
- .seat { font-size: 11px; text-align: center; padding: 6px 0; border-radius: 6px; }
- .free { background: #D2DDDB; border: 1px solid #D2DDDB; color: #006747; font-weight: 700; }
- .booked { background: #e0882e; color: #fff; border: 1px solid #e0882e; font-weight: 700; }
- .aisle { width: 10px; }
- .legend { position: absolute; left: 400px; font-size: 12px; top: 70px; font-size: 13px; line-height: 2; color: #44554d; }
- .legend span { display: inline-block; width: 18px; height: 14px; border-radius: 4px; vertical-align: middle; margin-right: 6px; }
+ .page { position: relative; width: 720px; height: 720px; background: #f7f7f7; color: #1d2b24; font-size: 14px; }
+ .bar { background: #fff; border-bottom: 1px solid #dde3e0; padding: 12px 18px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+ .sel { border: 1px solid #c9d2ce; border-radius: 6px; padding: 4px 9px; font-weight: 500; background: #fff; }
+ .map { position: absolute; right: 22px; top: 62px; background: #fff; border: 1px solid #e6e9e8; border-radius: 12px; padding: 12px 16px; }
+ .grid { display: grid; grid-template-columns: 50px 50px 26px 50px 50px; gap: 6px 8px; }
+ .seat { font: 700 10.5px/1 system-ui, sans-serif; text-align: center; padding: 9px 0; border-radius: 9px; }
+ .free { background: #fff; border: 1px solid #1d2b24; color: #1d2b24; }
+ .booked { background: #e0882e; color: #fff; border: 1px solid #e0882e; }
+ .prog { background: #5e9e1f; color: #fff; border: 1px solid #5e9e1f; }
+ .gap { grid-column: 1 / -1; height: 18px; }
+ .overlay { left: 22px; right: auto; bottom: auto; top: 214px; width: 318px; border: 2px solid #0b63ff;
+   box-shadow: 0 0 0 6px rgba(11,99,255,.28), 0 8px 28px rgba(0,0,0,.5); }
+ .overlay .stage { font-size: 17px; }
+ .overlay .sub { font: 600 12.5px/1.45 system-ui, sans-serif; color: #d8ffe9; }
+ .overlay .guess { color: #ffe08a; }
+ .chip { display: inline-block; margin: 6px 6px 2px 0; padding: 5px 11px; border-radius: 999px; background: #0b63ff; color: #fff;
+   font: 800 14px/1.2 system-ui, sans-serif; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 8px rgba(11,99,255,.5); }
+ .legend { position: absolute; left: 24px; top: 78px; font-size: 12.5px; line-height: 1.9; color: #44554d; }
+ .legend span { display: inline-block; width: 16px; height: 13px; border-radius: 4px; vertical-align: middle; margin-right: 6px; }
 </style></head><body>
 <div class="copy">
   <div class="brand"><img src="../../shohoz-autobook/icon128.png">BD Rail Ticket Alarm</div>
-  <h1>Good seats, <em style="color:#5b9bff">ringed in blue</em> for you</h1>
+  <h1>Good seats ringed in blue, <em style="color:#ffe08a">and which way they face</em></h1>
   <ul>
-    <li>Middle of the coach — away from doors</li>
-    <li>Side by side for 2+ tickets</li>
+    <li>Rows beside the coach's middle gap</li>
+    <li>Side by side, never across the aisle</li>
+    <li>🧭 Guesses forward ⬆ or backward ⬇</li>
     <li>Or your own coaches / exact seats</li>
-    <li>Tells you if another coach is emptier</li>
   </ul>
 </div>
 <div class="frame page">
-  <div class="bar">SUBORNO EXPRESS (702) · S_CHAIR <span class="sel">JHA - 17 Seat(s) ▾</span></div>
-  <div class="grid">
-<span class="seat booked">JHA-1</span><span class="seat booked">JHA-2</span><span class="aisle"></span><span class="seat booked">JHA-3</span><span class="seat booked">JHA-4</span>
-<span class="seat booked">JHA-5</span><span class="seat booked">JHA-6</span><span class="aisle"></span><span class="seat booked">JHA-7</span><span class="seat booked">JHA-8</span>
-<span class="seat booked">JHA-9</span><span class="seat booked">JHA-10</span><span class="aisle"></span><span class="seat booked">JHA-11</span><span class="seat booked">JHA-12</span>
-<span class="seat booked">JHA-13</span><span class="seat booked">JHA-14</span><span class="aisle"></span><span class="seat booked">JHA-15</span><span class="seat free">JHA-16</span>
-<span class="seat free">JHA-17</span><span class="seat free">JHA-18</span><span class="aisle"></span><span class="seat free">JHA-19</span><span class="seat free">JHA-20</span>
-<span class="seat free">JHA-21</span><span class="seat free">JHA-22</span><span class="aisle"></span><span class="seat free">JHA-23</span><span class="seat booked">JHA-24</span>
-<span class="seat booked">JHA-25</span><span class="seat booked">JHA-26</span><span class="aisle"></span><span class="seat free suggest">JHA-27</span><span class="seat free suggest">JHA-28</span>
-<span class="seat free">JHA-29</span><span class="seat free">JHA-30</span><span class="aisle"></span><span class="seat free">JHA-31</span><span class="seat free">JHA-32</span>
-<span class="seat booked">JHA-33</span><span class="seat booked">JHA-34</span><span class="aisle"></span><span class="seat booked">JHA-35</span><span class="seat booked">JHA-36</span>
-<span class="seat booked">JHA-37</span><span class="seat free">JHA-38</span><span class="aisle"></span><span class="seat booked">JHA-39</span><span class="seat booked">JHA-40</span>
-<span class="seat free">JHA-41</span><span class="seat booked">JHA-42</span><span class="aisle"></span><span class="seat booked">JHA-43</span><span class="seat booked">JHA-44</span>
-<span class="seat free">JHA-45</span><span class="seat booked">JHA-46</span><span class="aisle"></span><span class="seat booked">JHA-47</span><span class="seat booked">JHA-48</span>
-<span class="seat booked">JHA-49</span><span class="seat booked">JHA-50</span><span class="aisle"></span><span class="seat booked">JHA-51</span><span class="seat booked">JHA-52</span>
-<span class="seat booked">JHA-53</span><span class="seat booked">JHA-54</span><span class="aisle"></span><span class="seat booked">JHA-55</span><span class="seat booked">JHA-56</span>
-<span class="seat booked">JHA-57</span><span class="seat booked">JHA-58</span><span class="aisle"></span><span class="seat booked">JHA-59</span><span class="seat booked">JHA-60</span>  </div>
+  <div class="bar">PARJOTAK EXPRESS · Dhaka → Cox's Bazar · S_CHAIR <span class="sel">DA - 25 Seat(s) ▾</span></div>
   <div class="legend">
-    <div><span style="background:#D2DDDB"></span>Available</div>
+    <div><span style="background:#fff;border:1px solid #1d2b24"></span>Available</div>
     <div><span style="background:#e0882e"></span>Booked</div>
-    <div><span style="background:#D2DDDB;outline:3px solid #0b63ff;outline-offset:1px"></span>Suggested by Ticket Alarm</div>
+    <div><span style="background:#5e9e1f"></span>In progress</div>
+    <div><span style="background:#fff;outline:3px solid #0b63ff;outline-offset:1px"></span>Suggested</div>
   </div>
+  <div class="map"><div class="grid">
+<span class="seat booked">DA-4</span><span class="seat booked">DA-3</span><span class="aisle"></span><span class="seat booked">DA-2</span><span class="seat free">DA-1</span>
+<span class="seat free">DA-8</span><span class="seat booked">DA-7</span><span class="aisle"></span><span class="seat prog">DA-6</span><span class="seat prog">DA-5</span>
+<span class="seat free">DA-12</span><span class="seat booked">DA-11</span><span class="aisle"></span><span class="seat prog">DA-10</span><span class="seat prog">DA-9</span>
+<span class="seat booked">DA-16</span><span class="seat booked">DA-15</span><span class="aisle"></span><span class="seat booked">DA-14</span><span class="seat booked">DA-13</span>
+<span class="seat free">DA-20</span><span class="seat free">DA-19</span><span class="aisle"></span><span class="seat free">DA-18</span><span class="seat free">DA-17</span>
+<span class="seat booked">DA-24</span><span class="seat free">DA-23</span><span class="aisle"></span><span class="seat free">DA-22</span><span class="seat free">DA-21</span>
+<span class="seat booked">DA-28</span><span class="seat booked">DA-27</span><span class="aisle"></span><span class="seat free">DA-26</span><span class="seat free">DA-25</span>
+<span class="seat booked">DA-32</span><span class="seat booked">DA-31</span><span class="aisle"></span><span class="seat prog">DA-30</span><span class="seat prog">DA-29</span>
+<span class="gap"></span>
+<span class="seat free suggest">DA-36</span><span class="seat free suggest">DA-35</span><span class="aisle"></span><span class="seat prog">DA-34</span><span class="seat prog">DA-33</span>
+<span class="seat free">DA-40</span><span class="seat free">DA-39</span><span class="aisle"></span><span class="seat booked">DA-38</span><span class="seat prog">DA-37</span>
+<span class="seat booked">DA-44</span><span class="seat booked">DA-43</span><span class="aisle"></span><span class="seat free">DA-42</span><span class="seat free">DA-41</span>
+<span class="seat prog">DA-48</span><span class="seat booked">DA-47</span><span class="aisle"></span><span class="seat free">DA-46</span><span class="seat free">DA-45</span>
+<span class="seat booked">DA-52</span><span class="seat booked">DA-51</span><span class="aisle"></span><span class="seat free">DA-50</span><span class="seat free">DA-49</span>
+<span class="seat booked">DA-56</span><span class="seat booked">DA-55</span><span class="aisle"></span><span class="seat free">DA-54</span><span class="seat free">DA-53</span>
+<span class="seat free">DA-60</span><span class="seat booked">DA-59</span><span class="aisle"></span><span class="seat free">DA-58</span><span class="seat free">DA-57</span>
+  </div></div>
   <div class="overlay">
     <div class="hd"><b style="color:#6fe3a5">🚆 Ticket Alarm</b><span class="stop">■ STOP</span></div>
-    <div class="stage">🪑 Pick the highlighted seats</div>
-    <div class="sub">Suggested: JHA-27, JHA-28 (side by side, middle of coach)
-Coach KHA has more free seats (31)</div>
-    <a>details ▾</a>
+    <div class="stage">🪑 Pick the seats ringed in blue</div>
+    <div class="sub">Click these seats on the map, then CONTINUE PURCHASE:
+<span class="guess">🧭 Guess, not official: DA-36, DA-35: likely forward ⬆ until Chattogram, then backward. Check the seat backs when you board.</span></div>
+    <span class="chip">DA-36 ⬆→⬇</span><span class="chip">DA-35 ⬆→⬇</span>
+    <div><a>details ▾</a></div>
   </div>
 </div>
 </body></html>

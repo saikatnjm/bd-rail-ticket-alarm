@@ -129,3 +129,11 @@ footer .in { max-width: 960px; margin: 0 auto; padding: 18px 16px 30px; }
 
 ol.steps figure { margin: 10px 0 4px; }
 ol.steps figure img { max-width: 640px; width: 100%; }
+
+/* "New" badge and the highlighted feature card. */
+.new { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  background: var(--accent); color: #fff; font: 700 11.5px/1.6 system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .new { color: #06281c; } }
+:root[data-theme="dark"] .new { color: #06281c; }
+.card.hl { border: 2px solid var(--accent); }
+.arrow { font-weight: 800; white-space: nowrap; }

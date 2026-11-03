@@ -445,9 +445,56 @@
       }
       if (!options.length) continue;
       options.sort((a, b) => a.dist - b.dist);
-      return options[0].block;
+      // Which half of the coach each seat is in; half 1 holds the lower numbers.
+      const numOf = (s) => parseInt(s.seat_number.split("-").pop(), 10) || 0;
+      const avg = (a) => a.reduce((t, s) => t + numOf(s), 0) / (a.length || 1);
+      const above = list.filter((s) => s.r.top + s.r.height / 2 < center);
+      const aboveIsLow = avg(above) <= avg(list.filter((s) => !above.includes(s)));
+      return options[0].block.map((s) => ({
+        ...s, half: (s.r.top + s.r.height / 2 < center) === aboveIsLow ? 1 : 2,
+      }));
     }
     return null;
+  }
+
+  // A guess at which way a seat faces, from a rule of thumb Bangla travel
+  // sites agree on (nothing official): about half of each coach faces each
+  // way; on trains leaving Dhaka the higher-numbered half (31–60) faces
+  // forward, on trains going to Dhaka the lower half (1–30). Trains to and
+  // from the Cox's Bazar line turn around at Chattogram, so the seats flip there.
+  // `fwd` is the facing for the first part of the trip (up to Chattogram when
+  // it flips there). Returns null when the route isn't to or from Dhaka.
+  const DHAKA_AREA = /^(dhaka|dhaka_cantonment|biman_bandar)$/i;
+  const COX_LINE = /^(cox's bazar|ramu|chakaria|dohazari|islamabad|lohagara|satkania|patiya)$/i;
+  function facingGuess(half) {
+    const q = new URLSearchParams(location.search);
+    const from = q.get("fromcity") || cfg.fromCity || "", to = q.get("tocity") || cfg.toCity || "";
+    let fwd;
+    if (DHAKA_AREA.test(from)) fwd = half === 2;
+    else if (DHAKA_AREA.test(to)) fwd = half === 1;
+    else return null;
+    const flipsAtCtg = COX_LINE.test(from) || COX_LINE.test(to);
+    // Coming from the Cox's Bazar line, the Dhaka rule only holds after Chattogram.
+    if (flipsAtCtg && COX_LINE.test(from)) fwd = !fwd;
+    return { fwd, flipsAtCtg };
+  }
+
+  function facingText(picked) {
+    const parts = [];
+    for (const fwd of [true, false]) {
+      const group = picked.filter((s) => s.facing && s.facing.fwd === fwd);
+      if (!group.length) continue;
+      const names = group.map((s) => s.seat_number).join(", ");
+      const flip = group[0].facing.flipsAtCtg;
+      parts.push(fwd
+        ? (flip ? tx(`${names}: likely forward ⬆ until Chattogram, then backward`, `${names}: সম্ভবত চট্টগ্রাম পর্যন্ত সামনের দিকে ⬆, তারপর উল্টো`)
+                : tx(`${names}: likely facing forward ⬆`, `${names}: সম্ভবত সামনের দিকে মুখ করা ⬆`))
+        : (flip ? tx(`${names}: likely backward ⬇ until Chattogram, then forward`, `${names}: সম্ভবত চট্টগ্রাম পর্যন্ত উল্টো ⬇, তারপর সামনের দিকে`)
+                : tx(`${names}: likely facing backward ⬇`, `${names}: সম্ভবত উল্টো দিকে মুখ করা ⬇`)));
+    }
+    if (!parts.length) return "";
+    return tx(`\n🧭 Guess, not official: ${parts.join("; ")}. Check the seat backs when you board.`,
+              `\n🧭 অনুমান, অফিসিয়াল নয়: ${parts.join("; ")}। ট্রেনে উঠে সিটের পিঠ দেখে নিশ্চিত হন।`);
   }
 
   // Outlines the best free seats in the seat map the user opened.
@@ -477,6 +524,16 @@
       .some((f) => seats.some((s) => s.seat_availability && s.seat_number.toUpperCase() === f));
     const picked = (!favFree && pickByLayout(seats, want, cfg.preferredCoaches || "")) ||
       scoreAndPick(seats, want, cfg.preferredCoaches || "", cfg.preferredSeats || "").picked;
+    const numOf = (n) => parseInt(n.split("-").pop(), 10) || 0;
+    for (const s of picked) {
+      // Seats picked without the layout: split the coach by seat number instead.
+      if (!s.half) {
+        const coach = s.seat_number.split("-")[0];
+        const top = Math.max(...seats.filter((x) => x.seat_number.split("-")[0] === coach).map((x) => numOf(x.seat_number)));
+        s.half = numOf(s.seat_number) <= top / 2 ? 1 : 2;
+      }
+      s.facing = facingGuess(s.half);
+    }
     for (const s of picked) s.el.classList.add("ab-suggest");
 
     // Coaches from the "Select Coach" dropdown ("JHA - 15 Seat(s)"). The
@@ -512,8 +569,12 @@
       if (best && best.free > picked.length * 3 && !prio.includes(current)) {
         text += tx(`\n👉 Emptier coach: ${best.name} (${best.free} free)`, `\n👉 বেশি খালি বগি: ${best.name} (${best.free}টি খালি)`);
       }
+      text += facingText(picked);
       setSub(text);
-      showChips(picked.map((s) => ({ label: s.seat_number, el: s.el })));
+      showChips(picked.map((s) => ({
+        label: s.seat_number + (!s.facing ? "" : s.facing.flipsAtCtg ? (s.facing.fwd ? " ⬆→⬇" : " ⬇→⬆")
+          : s.facing.fwd ? " ⬆" : " ⬇"), el: s.el,
+      })));
     } else if (others.length) {
       warn(tx(`No free seat in ${current || "this coach"}.`, `${current || "এই বগি"}-তে খালি সিট নেই।`));
       setStage("coachfull");
