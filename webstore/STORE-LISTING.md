@@ -36,7 +36,7 @@ WHAT IT DOES
 • Loud alarm the moment seats open — keeps ringing until you click the page
 • Scrolls to your train and lights up BOOK NOW
 • Outlines good seats: middle of the coach, side by side for 2+ tickets, or your own preferred coaches/seats
-• Guesses which way each suggested seat faces: forward ⬆ or backward ⬇ (a common rule of thumb, not official)
+• Suggests forward-facing seats first, and shows which way each seat likely faces: forward ⬆ or backward ⬇ (a common rule of thumb, not official)
 • Tells you if another coach has more free seats
 • Shows whether you're logged in
 • Saved trips and recent run history

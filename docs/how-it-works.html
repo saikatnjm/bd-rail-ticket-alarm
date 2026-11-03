@@ -167,7 +167,9 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
     <li><b>The computer has to be on.</b> A sleeping laptop or a closed browser means the alarm fires late or not at all.</li>
     <li><b>One trip per ARM.</b> One route, date and train. The search asks for your first class; the others in your list are picked from the same results.</li>
     <li><b>Online seats only.</b> The site's numbers mix counter and online quotas; only online seats count.</li>
-    <li><b>Seat direction is a rule of thumb.</b> <code>facingGuess()</code> uses what Bangla travel sites agree on:
+    <li><b>Seat direction is a rule of thumb, and it steers the picks.</b> <code>pickByLayout()</code> ranks seats in the
+        likely-forward half (<code>forwardHalf()</code>) ahead of seats nearer the middle in the other half.
+        <code>facingGuess()</code> uses what Bangla travel sites agree on:
         leaving Dhaka, the higher-numbered half (31–60) faces forward; going to Dhaka, the lower half (1–30).
         The coach is split at the seat map's middle gap (<code>pickByLayout()</code>), not at a fixed seat number.
         Trips to or from the Cox's Bazar line flip at Chattogram. Routes that don't start or end in Dhaka get no guess.

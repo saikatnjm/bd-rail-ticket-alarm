@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BD Rail Ticket Alarm",
   "short_name": "Ticket Alarm",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Rings an alarm the second Bangladesh Railway tickets for your train go on sale, then highlights BOOK NOW and good seats.",
   "homepage_url": "https://saikatnjm.github.io/bd-rail-ticket-alarm/",
   "permissions": [

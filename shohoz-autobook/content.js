@@ -399,8 +399,10 @@
   // Picks by where seats sit on the map, not by their numbers. A coach's map
   // has a wide gap between its two halves; when that gap is near the middle,
   // the rows beside it count as the middle. Seats for 2+ tickets must share
-  // a row with no aisle between them. Returns null if the map can't be measured.
-  function pickByLayout(seats, count, preferredCoaches) {
+  // a row with no aisle between them. Seats in `preferHalf` (the half likely
+  // facing forward) win over seats nearer the middle in the other half.
+  // Returns null if the map can't be measured.
+  function pickByLayout(seats, count, preferredCoaches, preferHalf) {
     const coachOf = (s) => s.seat_number.split("-")[0].toUpperCase();
     const all = seats.map((s) => ({ ...s, r: s.el.getBoundingClientRect() }));
     if (!all.length || all.some((s) => !s.r.width || !s.r.height)) return null;
@@ -434,25 +436,26 @@
       if (wide.d > 1.6 * median(steps.map((g) => g.d)) &&
           Math.abs(wide.mid - center) <= (last - first) / 6) center = wide.mid;
 
+      // Which half of the coach each seat is in; half 1 holds the lower numbers.
+      const numOf = (s) => parseInt(s.seat_number.split("-").pop(), 10) || 0;
+      const avg = (a) => a.reduce((t, s) => t + numOf(s), 0) / (a.length || 1);
+      const above = list.filter((s) => s.r.top + s.r.height / 2 < center);
+      const aboveIsLow = avg(above) <= avg(list.filter((s) => !above.includes(s)));
+      const halfOf = (y) => ((y < center) === aboveIsLow ? 1 : 2);
+
       const options = [];
       for (const row of rows) {
         const free = row.seats.filter((s) => s.seat_availability).sort((a, b) => a.r.left - b.r.left);
         for (let i = 0; i + count <= free.length; i++) {
           const block = free.slice(i, i + count);
           const together = block.every((s, k) => k === 0 || s.r.left - block[k - 1].r.right < seatW * 0.6);
-          if (together) options.push({ block, dist: Math.abs(row.y - center) });
+          if (together) options.push({ block, half: halfOf(row.y), dist: Math.abs(row.y - center) });
         }
       }
       if (!options.length) continue;
-      options.sort((a, b) => a.dist - b.dist);
-      // Which half of the coach each seat is in; half 1 holds the lower numbers.
-      const numOf = (s) => parseInt(s.seat_number.split("-").pop(), 10) || 0;
-      const avg = (a) => a.reduce((t, s) => t + numOf(s), 0) / (a.length || 1);
-      const above = list.filter((s) => s.r.top + s.r.height / 2 < center);
-      const aboveIsLow = avg(above) <= avg(list.filter((s) => !above.includes(s)));
-      return options[0].block.map((s) => ({
-        ...s, half: (s.r.top + s.r.height / 2 < center) === aboveIsLow ? 1 : 2,
-      }));
+      const off = (o) => (preferHalf && o.half !== preferHalf ? 1 : 0);
+      options.sort((a, b) => off(a) - off(b) || a.dist - b.dist);
+      return options[0].block.map((s) => ({ ...s, half: options[0].half }));
     }
     return null;
   }
@@ -466,9 +469,18 @@
   // it flips there). Returns null when the route isn't to or from Dhaka.
   const DHAKA_AREA = /^(dhaka|dhaka_cantonment|biman_bandar)$/i;
   const COX_LINE = /^(cox's bazar|ramu|chakaria|dohazari|islamabad|lohagara|satkania|patiya)$/i;
-  function facingGuess(half) {
+  function routeEnds() {
     const q = new URLSearchParams(location.search);
-    const from = q.get("fromcity") || cfg.fromCity || "", to = q.get("tocity") || cfg.toCity || "";
+    return { from: q.get("fromcity") || cfg.fromCity || "", to: q.get("tocity") || cfg.toCity || "" };
+  }
+  // The half that likely faces forward on the Dhaka side of the trip (for
+  // Cox's Bazar trips that's Dhaka–Chattogram, the longer part), or null.
+  function forwardHalf() {
+    const { from, to } = routeEnds();
+    return DHAKA_AREA.test(from) ? 2 : DHAKA_AREA.test(to) ? 1 : null;
+  }
+  function facingGuess(half) {
+    const { from, to } = routeEnds();
     let fwd;
     if (DHAKA_AREA.test(from)) fwd = half === 2;
     else if (DHAKA_AREA.test(to)) fwd = half === 1;
@@ -522,16 +534,23 @@
     const want = Number(cfg.seatCount) || 1;
     const favFree = (cfg.preferredSeats || "").split(",").map((c) => c.trim().toUpperCase())
       .some((f) => seats.some((s) => s.seat_availability && s.seat_number.toUpperCase() === f));
-    const picked = (!favFree && pickByLayout(seats, want, cfg.preferredCoaches || "")) ||
-      scoreAndPick(seats, want, cfg.preferredCoaches || "", cfg.preferredSeats || "").picked;
     const numOf = (n) => parseInt(n.split("-").pop(), 10) || 0;
+    const prefer = forwardHalf();
+    // Without a measurable map, split the coach by seat number instead.
+    const numHalf = (s) => {
+      const coach = s.seat_number.split("-")[0];
+      const top = Math.max(...seats.filter((x) => x.seat_number.split("-")[0] === coach).map((x) => numOf(x.seat_number)));
+      return numOf(s.seat_number) <= top / 2 ? 1 : 2;
+    };
+    const byNumber = (list) => scoreAndPick(list, want, cfg.preferredCoaches || "", cfg.preferredSeats || "").picked;
+    let picked = !favFree && pickByLayout(seats, want, cfg.preferredCoaches || "", prefer);
+    if (!picked && prefer && !favFree) {
+      const fwd = byNumber(seats.filter((s) => numHalf(s) === prefer));
+      if (fwd.length === want) picked = fwd;
+    }
+    if (!picked) picked = byNumber(seats);
     for (const s of picked) {
-      // Seats picked without the layout: split the coach by seat number instead.
-      if (!s.half) {
-        const coach = s.seat_number.split("-")[0];
-        const top = Math.max(...seats.filter((x) => x.seat_number.split("-")[0] === coach).map((x) => numOf(x.seat_number)));
-        s.half = numOf(s.seat_number) <= top / 2 ? 1 : 2;
-      }
+      if (!s.half) s.half = numHalf(s);
       s.facing = facingGuess(s.half);
     }
     for (const s of picked) s.el.classList.add("ab-suggest");
@@ -570,6 +589,10 @@
         text += tx(`\n👉 Emptier coach: ${best.name} (${best.free} free)`, `\n👉 বেশি খালি বগি: ${best.name} (${best.free}টি খালি)`);
       }
       text += facingText(picked);
+      if (prefer && !favFree && picked.some((s) => s.half !== prefer)) {
+        text += tx(`\n(No ${want > 1 ? "side-by-side " : ""}forward-facing seats free in this coach.)`,
+                   `\n(এই বগিতে ${want > 1 ? "পাশাপাশি " : ""}সামনের দিকে মুখ করা খালি সিট নেই।)`);
+      }
       setSub(text);
       showChips(picked.map((s) => ({
         label: s.seat_number + (!s.facing ? "" : s.facing.flipsAtCtg ? (s.facing.fwd ? " ⬆→⬇" : " ⬇→⬆")
