@@ -37,7 +37,18 @@
     const st = document.createElement("style");
     st.id = "ab-styles";
     st.textContent = `
-      .ab-class-info { display: block; margin-top: 2px; font: 600 11.5px/1.3 system-ui, sans-serif; color: #2f6b53; white-space: normal; }
+      .ab-class-cap { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); max-width: 122px;
+        padding: 3px 9px 3px 8px; border-radius: 999px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        font: 600 10.5px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif; letter-spacing: .01em;
+        background: #f1f4f3; color: #3c4a45; border: 1px solid #dfe6e3; cursor: help; }
+      .ab-class-cap::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%;
+        background: #9aa7a3; vertical-align: 1px; }
+      .ab-class-cap.ab-ac { background: #eaf4ff; color: #0b5cad; border-color: #cfe3fb; }
+      .ab-class-cap.ab-ac::before { background: #2f8fe0; }
+      .ab-capped { padding-bottom: 40px !important; }
+      .ab-class-info { display: none !important; } /* in-box labels from 1.5.3, if a tab still has them */
+      .ab-trip-capped { interpolate-size: allow-keywords; }
+      .trip-collapsed.ab-trip-capped { height: auto !important; }
       .ab-pulse { outline: 4px solid #ffd166 !important; outline-offset: 3px; animation: abPulse 1s infinite; }
       @keyframes abPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,209,102,.9); } 50% { box-shadow: 0 0 0 12px rgba(255,209,102,0); } }
       .ab-hot { border: 2px solid #0b63ff !important; animation: abHot 1.4s ease-in-out infinite; }
@@ -811,20 +822,25 @@
   }
 
   // ---------- class labels ----------
-  // Puts a few plain words ("❄️ 💺 AC chair") under every class name on the
-  // site's train list, with the full meaning on hover. Reads and adds to the page only.
+  // Hangs a small pill ("AC chair", "Non-AC sleeper") under every class box
+  // on the site's train list; blue means air-conditioned, and hovering shows
+  // the full meaning. The site's boxes have fixed heights, so the pill sits
+  // outside the box and the train card is let grow to make room for it.
+  // Reads and adds to the page only.
   function labelClassBoxes() {
+    const bn = cfg?.lang === "bn";
     for (const name of document.querySelectorAll(".seat-class-name")) {
-      if (name.nextElementSibling?.classList.contains("ab-class-info")) continue;
-      const bn = cfg?.lang === "bn";
-      const label = RAIL_DATA.classLabel(name.textContent, bn, true);
-      if (!label) continue;
+      const box = name.closest(".single-seat-class");
+      const info = RAIL_DATA.classOf(name.textContent);
+      if (!box || !info || box.querySelector(":scope > .ab-class-cap")) continue;
       injectStyles();
       const el = document.createElement("span");
-      el.className = "ab-class-info";
-      el.textContent = label;
-      el.title = RAIL_DATA.classLabel(name.textContent, bn);
-      name.after(el);
+      el.className = "ab-class-cap" + (info.ac ? " ab-ac" : "");
+      el.textContent = bn ? info.sbn : info.sen;
+      el.title = `${name.textContent.trim()}: ${bn ? info.bn : info.en}`;
+      box.appendChild(el);
+      box.parentElement.classList.add("ab-capped");
+      box.closest(".trip-collapsible")?.classList.add("ab-trip-capped");
     }
   }
 

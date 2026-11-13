@@ -715,23 +715,24 @@ const RAIL_DATA = {
 // Railway's own (seatClasses above); the meanings come from travel guides,
 // which agree on all but AC_CHAIR (little documented — treat as an AC chair
 // coach like Snigdha). ac: air-conditioned; bed: you get a berth to sleep on;
-// sen/sbn: short English/Bangla; en/bn: full sentence.
+// sen/sbn: the few English/Bangla words shown under a class box on the site;
+// en/bn: full sentence.
 RAIL_DATA.classInfo = {
-  AC_B:     { ac: 1, bed: 1, sen: "AC berth to sleep · cabin", sbn: "এসি বার্থ (শোয়া) · কেবিন", en: "AC sleeper berth in a cabin, bedding given",          bn: "এসি কেবিনে শোয়ার বার্থ, বিছানাপত্র দেয়" },
-  AC_S:     { ac: 1, bed: 0, sen: "AC seat · cabin", sbn: "এসি সিট · কেবিন", en: "AC cabin seat (sleeper cabin used for sitting, no bedding)", bn: "এসি কেবিনে বসার সিট (বার্থের কেবিন, বিছানাপত্র নেই)" },
+  AC_B:     { ac: 1, bed: 1, sen: "AC sleeper cabin", sbn: "এসি স্লিপার কেবিন", en: "AC sleeper berth in a cabin, bedding given",          bn: "এসি কেবিনে শোয়ার বার্থ, বিছানাপত্র দেয়" },
+  AC_S:     { ac: 1, bed: 0, sen: "AC cabin seat", sbn: "এসি কেবিন সিট", en: "AC cabin seat (sleeper cabin used for sitting, no bedding)", bn: "এসি কেবিনে বসার সিট (বার্থের কেবিন, বিছানাপত্র নেই)" },
   SNIGDHA:  { ac: 1, bed: 0, sen: "AC chair", sbn: "এসি চেয়ার", en: "AC chair in an open coach",                            bn: "খোলা কোচে এসি চেয়ার" },
   AC_CHAIR: { ac: 1, bed: 0, sen: "AC chair", sbn: "এসি চেয়ার", en: "AC chair in an open coach, much like Snigdha",          bn: "খোলা কোচে এসি চেয়ার, স্নিগ্ধার মতো" },
-  F_BERTH:  { ac: 0, bed: 1, sen: "Non-AC berth to sleep · cabin", sbn: "নন-এসি বার্থ (শোয়া) · কেবিন", en: "Non-AC sleeper berth in a first-class cabin",           bn: "নন-এসি ফার্স্ট ক্লাস কেবিনে শোয়ার বার্থ" },
-  F_SEAT:   { ac: 0, bed: 0, sen: "Non-AC seat · cabin", sbn: "নন-এসি সিট · কেবিন", en: "Non-AC seat in a first-class cabin",                    bn: "নন-এসি ফার্স্ট ক্লাস কেবিনে বসার সিট" },
-  F_CHAIR:  { ac: 0, bed: 0, sen: "Non-AC 1st-class chair", sbn: "নন-এসি ফার্স্ট ক্লাস চেয়ার", en: "Non-AC first-class chair in an open coach",             bn: "খোলা কোচে নন-এসি ফার্স্ট ক্লাস চেয়ার" },
+  F_BERTH:  { ac: 0, bed: 1, sen: "Non-AC sleeper", sbn: "নন-এসি স্লিপার", en: "Non-AC sleeper berth in a first-class cabin",           bn: "নন-এসি ফার্স্ট ক্লাস কেবিনে শোয়ার বার্থ" },
+  F_SEAT:   { ac: 0, bed: 0, sen: "Non-AC cabin seat", sbn: "নন-এসি কেবিন সিট", en: "Non-AC seat in a first-class cabin",                    bn: "নন-এসি ফার্স্ট ক্লাস কেবিনে বসার সিট" },
+  F_CHAIR:  { ac: 0, bed: 0, sen: "Non-AC 1st chair", sbn: "নন-এসি ফার্স্ট চেয়ার", en: "Non-AC first-class chair in an open coach",             bn: "খোলা কোচে নন-এসি ফার্স্ট ক্লাস চেয়ার" },
   S_CHAIR:  { ac: 0, bed: 0, sen: "Non-AC chair", sbn: "নন-এসি চেয়ার", en: "Shovan chair: non-AC numbered seat in an open coach",   bn: "শোভন চেয়ার: খোলা কোচে নন-এসি নম্বরওয়ালা সিট" },
-  SHOVAN:   { ac: 0, bed: 0, sen: "Non-AC basic seat", sbn: "নন-এসি সাধারণ আসন", en: "Shovan: basic non-AC seat, cheaper than Shovan chair",  bn: "শোভন: সাধারণ নন-এসি আসন, শোভন চেয়ারের চেয়ে সস্তা" },
-  SHULOV:   { ac: 0, bed: 0, sen: "Cheapest · bench", sbn: "সবচেয়ে সস্তা · বেঞ্চ", en: "Shulov: cheapest, plain bench seats",                   bn: "শুলভ: সবচেয়ে সস্তা, সাধারণ বেঞ্চ" },
+  SHOVAN:   { ac: 0, bed: 0, sen: "Non-AC basic seat", sbn: "নন-এসি সাধারণ সিট", en: "Shovan: basic non-AC seat, cheaper than Shovan chair",  bn: "শোভন: সাধারণ নন-এসি আসন, শোভন চেয়ারের চেয়ে সস্তা" },
+  SHULOV:   { ac: 0, bed: 0, sen: "Cheapest bench", sbn: "সবচেয়ে সস্তা বেঞ্চ", en: "Shulov: cheapest, plain bench seats",                   bn: "শুলভ: সবচেয়ে সস্তা, সাধারণ বেঞ্চ" },
 };
-// short: the few words that fit under a class name on the site.
-RAIL_DATA.classLabel = (code, bn, short) => {
-  const i = RAIL_DATA.classInfo[String(code || "").trim().toUpperCase().replace(/[\s-]+/g, "_")];
+RAIL_DATA.classOf = (code) =>
+  RAIL_DATA.classInfo[String(code || "").trim().toUpperCase().replace(/[\s-]+/g, "_")] || null;
+RAIL_DATA.classLabel = (code, bn) => {
+  const i = RAIL_DATA.classOf(code);
   if (!i) return "";
-  const text = short ? (bn ? i.sbn : i.sen) : (bn ? i.bn : i.en);
-  return (i.ac ? "❄️ " : "") + (i.bed ? "🛏️ " : "💺 ") + text;
+  return (i.ac ? "❄️ " : "") + (i.bed ? "🛏️ " : "💺 ") + (bn ? i.bn : i.en);
 };
