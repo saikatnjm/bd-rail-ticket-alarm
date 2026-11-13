@@ -89,6 +89,7 @@ Seats!  save a short "found" note, send a notification,
 Reload  content.js sees the note → alarm on, scroll to the train, make BOOK NOW glow
 User    clicks BOOK NOW → the site loads the seat map (and runs its own bot check — untouched)
         content.js watches the page (MutationObserver) → outlines the best free seats
+        (this part runs for any seat map the user opens, with or without an alarm)
         and guesses which way each faces (⬆ / ⬇ / ⬆→⬇)
         ← zero network requests from the extension in this step
 User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>

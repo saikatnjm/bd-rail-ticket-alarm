@@ -557,6 +557,48 @@ async function checkLogin(openIfMissing) {
   applyLogin(await askTab(tabs[0].id));
 }
 
+// ---------- the site's own search ----------
+// When the ticket tab is showing a different trip (the user searched on the
+// site itself), offer to bring the panel in line with it. Never while armed:
+// an armed trip must not change under the alarm.
+let siteTrip = null;
+async function checkSiteSearch() {
+  const box = $("siteSearch");
+  box.style.display = "none";
+  siteTrip = null;
+  if (armedCache) return;
+  const here = await chrome.tabs.query({ active: true, currentWindow: true, url: "https://eticket.railway.gov.bd/*" });
+  const tabs = here.length ? here : await chrome.tabs.query({ url: "https://eticket.railway.gov.bd/*" });
+  if (!tabs.length) return;
+  let res = null;
+  try { res = await sendToTab(tabs[0].id, { type: "pageSearch" }); } catch (_) {}
+  const m = String(res?.doj || "").match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
+  const mon = m ? ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(m[2].toLowerCase()) : -1;
+  if (!res?.from || !validStation(res.from) || !validStation(res.to) || mon < 0) return;
+  const d = new Date(+m[3], mon, +m[1]);
+  const today = day0(new Date());
+  if (d < today || d > addDays(today, MAX_PLAN_DAYS)) return;
+  const same = res.from === $("fromCity").value.trim() && res.to === $("toCity").value.trim() && iso(d) === $("journeyDate").value;
+  if (same) return;
+  siteTrip = { from: res.from, to: res.to, date: iso(d) };
+  $("siteSearchText").textContent = t("siteSearchShows", { from: res.from, to: res.to, d: dojFmt(d) });
+  box.style.display = "flex";
+}
+$("siteSearchUse").onclick = async () => {
+  if (!siteTrip) return;
+  // Another route's train is almost never the right one.
+  if (siteTrip.from !== $("fromCity").value.trim() || siteTrip.to !== $("toCity").value.trim()) $("trainQuery").value = "";
+  $("fromCity").value = siteTrip.from;
+  $("toCity").value = siteTrip.to;
+  $("journeyDate").value = siteTrip.date;
+  calMonth = null;
+  $("siteSearch").style.display = "none";
+  siteTrip = null;
+  await saveConfig();
+  renderCal();
+  refreshFlow();
+};
+
 // ---------- saved trips (presets) ----------
 async function loadPresets(selectName) {
   const { presets } = await chrome.storage.local.get("presets");
@@ -771,6 +813,7 @@ loadConfig().then(() => {
   applyLang();
   loadCachedTrains();
   checkLogin(false);
+  refreshArmState().then(checkSiteSearch);
   loadPresets();
   renderHistory();
 });

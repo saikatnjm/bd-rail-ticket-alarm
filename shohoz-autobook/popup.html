@@ -33,6 +33,9 @@
     .cal-day.sel { background: #1f9e63; color: #fff; font-weight: 700; }
     .cal-day.today { outline: 1px solid #1f9e63; }
     .linkbtn { all: unset; cursor: pointer; color: #9adbb8; font-size: 11px; }
+    #siteSearch { align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 6px; padding: 6px 8px; border-radius: 6px;
+      border: 1px solid #0b63ff; background: rgba(11, 99, 255, .12); font-size: 11.5px; line-height: 1.35; }
+    #siteSearchUse { width: auto; margin: 0; padding: 4px 9px; white-space: nowrap; flex: none; }
     #langToggle { all: unset; cursor: pointer; font-size: 12px; font-weight: 700; color: #0e1b14; background: #6fe3a5; border-radius: 5px; padding: 2px 8px; }
     .step { display: flex; align-items: center; gap: 7px; margin: 10px 0 4px; cursor: pointer; background: #132b1f; border: 1px solid #275c43; border-radius: 7px; padding: 7px 10px; transition: border-color .12s, background .12s; }
     .step.foldable:hover { border-color: #4fbe8a; background: #173526; }
@@ -75,6 +78,10 @@
         <button id="openSite" class="linkbtn" data-i18n="openSite" title="https://eticket.railway.gov.bd/">🌐 Open site</button>
         <button id="loginCheck" class="linkbtn" data-i18n="recheck" style="margin-left:8px">↻ re-check</button>
       </span>
+    </div>
+    <div id="siteSearch" style="display:none">
+      <span id="siteSearchText"></span>
+      <button id="siteSearchUse" class="minor" data-i18n="siteSearchUse">Use this trip</button>
     </div>
 
     <div id="nextCard">

@@ -45,7 +45,11 @@
     },
     tabs: {
       query: async () => [{ id: 1 }],
-      sendMessage: async (id, m) => m.type === "authStatus" ? { loggedIn: true, user: "Rahim" } : { ok: true },
+      sendMessage: async (id, m) => {
+        if (m.type === "authStatus") return { loggedIn: true, user: "Rahim" };
+        if (m.type === "pageSearch" && q.get("site")) { const [from, to, doj] = q.get("site").split("|"); return { ok: true, from, to, doj }; }
+        return { ok: true };
+      },
       create: async () => {},
     },
   };

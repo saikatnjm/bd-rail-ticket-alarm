@@ -19,6 +19,12 @@
   let overlay, logBox, mission, cfg;
   let engineStarted = false;
   let aborted = false;
+  // Seat help shows on any seat map the user opens, alarm or not.
+  let seatHelpOn = false;      // the box is currently showing seat help
+  let boxClosed = false;       // the user closed the box (✕); it stays away until another seat map is opened
+  let closedMapGone = false;   // ...and the seat map it was closed on has gone
+  let baseStage = null;        // what the box showed before seat help took over
+  let lastLog = null;
 
   // Pick Bangla text when the popup language is Bangla.
   const tx = (en, bn) => (cfg?.lang === "bn" && bn ? bn : en);
@@ -78,7 +84,10 @@
 
   // ---------- tiny UI overlay ----------
   function ensureOverlay() {
-    if (overlay) return;
+    if (overlay) {
+      if (!overlay.isConnected && !boxClosed) document.documentElement.appendChild(overlay);
+      return;
+    }
     overlay = document.createElement("div");
     overlay.style.cssText =
       "position:fixed;z-index:2147483647;right:12px;bottom:12px;width:340px;max-height:50vh;" +
@@ -114,7 +123,12 @@
       setStage("stopped");
       err(tx("■ STOP pressed — aborting run.", "■ STOP — থামানো হচ্ছে।"));
     };
-    overlay.querySelector("#ab-close").onclick = () => { aborted = true; sirenOff(); overlay.remove(); };
+    overlay.querySelector("#ab-close").onclick = () => {
+      aborted = true; sirenOff(); overlay.remove();
+      boxClosed = true; closedMapGone = !seatButtons().length;
+      seatHelpOn = false; lastSuggestion = "";
+      for (const b of document.querySelectorAll(".ab-suggest")) b.classList.remove("ab-suggest");
+    };
     overlay.querySelector("#ab-hide").onclick = () => {
       for (const id of ["ab-stage", "ab-sub", "ab-chips", "ab-details", "ab-log"]) {
         const el = overlay.querySelector("#" + id);
@@ -137,6 +151,10 @@
       stopped: [tx("■ Stopped", "■ থামানো হয়েছে"), "#ff6b6b"],
     };
     const [text, color] = map[stage] || [stage, "#9adbb8"];
+    if (stage !== "seatmap" && stage !== "coachfull") {
+      baseStage = stage;
+      if (seatHelpOn) return; // shown again once the seat map is closed
+    }
     const el = overlay.querySelector("#ab-stage");
     el.textContent = text;
     el.style.color = color;
@@ -209,7 +227,7 @@
     } catch (_) {}
   }
 
-  function log(msg, color) {
+  function log(msg, color, seatNote) {
     ensureOverlay();
     const t = new Date().toISOString().slice(11, 23);
     const line = document.createElement("div");
@@ -217,8 +235,10 @@
     line.textContent = `[${t}] ${msg}`;
     logBox.appendChild(line);
     logBox.scrollTop = logBox.scrollHeight;
+    // While seat help is on screen, run messages wait in the details.
+    if (!seatNote) lastLog = { msg, color: color || "#9adbb8" };
     const sub = overlay.querySelector("#ab-sub");
-    if (sub) { sub.textContent = msg; sub.style.color = color || "#9adbb8"; }
+    if (sub && !seatHelpOn) { sub.textContent = msg; sub.style.color = color || "#9adbb8"; }
     console.log("[autobook]", msg);
   }
   const ok = (m) => log(m, "#6fe3a5");
@@ -667,6 +687,7 @@
     if (btns.length === 0) return;
     injectStyles();
     ensureOverlay();
+    seatHelpOn = true;
     for (const b of document.querySelectorAll(".ab-suggest")) b.classList.remove("ab-suggest");
 
     const seats = btns.map((b) => ({
@@ -730,9 +751,12 @@
 
     if (picked.length) {
       const names = picked.map((s) => s.seat_number).join(", ");
-      ok(tx(`Suggested: ${names}`, `পরামর্শ: ${names}`));
+      log(tx(`Suggested: ${names}`, `পরামর্শ: ${names}`), "#6fe3a5", true);
       setStage("seatmap");
-      let text = tx("Click these seats on the map, then CONTINUE PURCHASE:", "ম্যাপে এই সিটগুলো চাপুন, তারপর CONTINUE PURCHASE:");
+      let text = want > 1
+        ? tx(`Best ${want} seats here. Click them on the map, then CONTINUE PURCHASE:`,
+             `এখানে সেরা ${want.toLocaleString("bn-BD")}টি সিট। ম্যাপে এগুলো চাপুন, তারপর CONTINUE PURCHASE:`)
+        : tx("Best seat here. Click it on the map, then CONTINUE PURCHASE:", "এখানে সেরা সিট। ম্যাপে এটি চাপুন, তারপর CONTINUE PURCHASE:");
       if (best && best.free > picked.length * 3 && !prio.includes(current)) {
         text += tx(`\n👉 Emptier coach: ${best.name} (${best.free} free)`, `\n👉 বেশি খালি বগি: ${best.name} (${best.free}টি খালি)`);
       }
@@ -761,13 +785,13 @@
           : s.facing.fwd ? " ⬆" : " ⬇"), el: s.el,
       })));
     } else if (others.length) {
-      warn(tx(`No free seat in ${current || "this coach"}.`, `${current || "এই বগি"}-তে খালি সিট নেই।`));
+      log(tx(`No free seat in ${current || "this coach"}.`, `${current || "এই বগি"}-তে খালি সিট নেই।`), "#ffd166", true);
       setStage("coachfull");
       setSub(tx(`Pick one of these in "Select Coach" (counts may include seats being paid for):`,
                 `"Select Coach" থেকে এগুলোর একটি বাছুন (সংখ্যায় পেমেন্ট চলা সিটও থাকতে পারে):`), "#ffd166");
       showChips(others.slice(0, 6).map((c) => ({ label: `${c.name} · ${c.free}` })));
     } else {
-      warn(tx("No free seats in any coach of this class.", "এই ক্লাসের কোনো বগিতে খালি সিট নেই।"));
+      log(tx("No free seats in any coach of this class.", "এই ক্লাসের কোনো বগিতে খালি সিট নেই।"), "#ffd166", true);
       setStage("coachfull");
       setSub(tx("Every coach in this class is taken or being paid for. Green “In Progress” seats can come back if a payment fails — keep this page open and watch, or try another class.",
                 "এই ক্লাসের সব সিট বিক্রি হয়েছে বা পেমেন্ট চলছে। সবুজ \"In Progress\" সিট পেমেন্ট ব্যর্থ হলে আবার খালি হতে পারে — পেজটা খোলা রেখে দেখুন, অথবা অন্য ক্লাস চেষ্টা করুন।"), "#ffd166");
@@ -775,17 +799,24 @@
     }
   }
 
-  function watchSeatMap() {
-    let timer = null;
-    const obs = new MutationObserver((mutations) => {
-      // Our own overlay log lines must not re-trigger this.
-      if (mutations.every((m) => overlay && overlay.contains(m.target))) return;
-      clearTimeout(timer);
-      timer = setTimeout(suggestSeats, 200);
-    });
-    obs.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => obs.disconnect(), ASSIST_TTL_MS);
-    suggestSeats();
+  // Seat help follows whatever seat map is on screen: the alarm's train, or
+  // any train and route the user searched for on the site itself. When the
+  // seat map goes away, the box goes back to what it showed before.
+  function refreshSeatHelp() {
+    if (seatButtons().length) {
+      if (boxClosed && closedMapGone) boxClosed = closedMapGone = false;
+      if (!boxClosed) suggestSeats();
+      return;
+    }
+    if (boxClosed) closedMapGone = true;
+    if (!seatHelpOn) return;
+    seatHelpOn = false;
+    lastSuggestion = "";
+    setHot(false);
+    if (!baseStage) { overlay?.remove(); return; } // nothing else to show
+    setStage(baseStage);
+    if (lastLog) setSub(lastLog.msg, lastLog.color);
+    placeOverlay();
   }
 
   // The chosen train isn't among this route's trains (usually one left over
@@ -992,15 +1023,14 @@
     ok(tx(`${found.train} · ${found.cls}: ${found.online} online seats.`,
           `${found.train} · ${found.cls}: ${found.online}টি অনলাইন সিট।`));
     const what = RAIL_DATA.classLabel(found.cls, cfg?.lang === "bn");
-    setSub(tx(`${found.train} · ${found.cls}: ${found.online} online seats.`, `${found.train} · ${found.cls}: ${found.online}টি অনলাইন সিট।`) +
-           (what ? `\n${found.cls} = ${what}` : ""));
     ok(tx("Click the glowing BOOK NOW → pick the outlined seats → CONTINUE PURCHASE → OTP → pay. (Click anywhere to stop the alarm.)",
-          "জ্বলতে থাকা BOOK NOW চাপুন → দাগানো সিট বাছুন → CONTINUE PURCHASE → OTP → পেমেন্ট। (অ্যালার্ম থামাতে যেকোনো জায়গায় ক্লিক করুন।)"));
+          "জ্বলতে থাকা BOOK NOW চাপুন → দাগানো সিট বাছুন → CONTINUE PURCHASE → OTP → পেমেন্ট। (অ্যালার্ম থামাতে যেকোনো জায়গায় ক্লিক করুন।)") +
+       (what ? `\n${found.cls} = ${what}` : ""));
     sirenOn();
     const shown = await highlightTrainCard(found);
     if (!shown) warn(tx("Couldn't find the train card on the page — scroll to it yourself.",
                         "পেজে ট্রেনটি খুঁজে পাওয়া যায়নি — নিজে স্ক্রল করে দেখুন।"));
-    watchSeatMap();
+    refreshSeatHelp();
   }
 
   // ---------- class labels ----------
@@ -1029,12 +1059,23 @@
   // Class pills and cabin outlines are kept up to date on every page.
   function watchPage() {
     let timer = null;
-    const run = () => { labelClassBoxes(); labelCabins(); };
-    new MutationObserver(() => {
+    const run = () => { labelClassBoxes(); labelCabins(); refreshSeatHelp(); };
+    new MutationObserver((mutations) => {
+      // Our own box's lines must not re-trigger this.
+      if (mutations.every((m) => overlay && overlay.contains(m.target))) return;
       clearTimeout(timer);
       timer = setTimeout(run, 300);
     }).observe(document.body, { childList: true, subtree: true });
     window.addEventListener("resize", labelCabins);
+    // Seats wanted or language changed in the panel: redo the suggestions.
+    chrome.storage.onChanged?.addListener((changes, area) => {
+      const now = area === "local" && changes.config?.newValue;
+      if (!now) return;
+      // Only what seat help uses; a run in progress keeps the trip it started with.
+      for (const k of ["seatCount", "preferredCoaches", "preferredSeats", "lang"]) if (k in now) cfg[k] = now[k];
+      lastSuggestion = "";
+      run();
+    });
     run();
   }
 
@@ -1108,6 +1149,11 @@
     if (msg.type === "listTrains") {
       listTrains(msg.from, msg.to, msg.dates || []).then(sendResponse);
       return true;
+    }
+    if (msg.type === "pageSearch") {
+      // The search the site itself is showing, so the panel can offer to use it.
+      const q = new URLSearchParams(location.search);
+      sendResponse({ ok: true, from: q.get("fromcity") || "", to: q.get("tocity") || "", doj: q.get("doj") || "" });
     }
     if (msg.type === "authStatus") {
       let user = null;
