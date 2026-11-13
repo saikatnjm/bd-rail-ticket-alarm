@@ -54,9 +54,9 @@
     <tr><th>File</th><th>Runs where</th><th>Job</th></tr>
     <tr><td><code>popup.html</code> / <code>popup.js</code></td><td>The toolbar panel</td><td>Calendar, route/train/seat form, ARM, countdown, saved trips, history, English/Bangla.</td></tr>
     <tr><td><code>background.js</code></td><td>Service worker</td><td>Works out the release time, sets <code>chrome.alarms</code> (main + 1-day + 1-hour reminders), opens the site tab ~75 s early, shows notifications, starts/stops the alarm sound.</td></tr>
-    <tr><td><code>content.js</code></td><td>Inside eticket.railway.gov.bd</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining, seat-direction guess.</td></tr>
+    <tr><td><code>content.js</code></td><td>Inside eticket.railway.gov.bd</td><td>The watcher: login check, clock sync, polite search loop, status box, BOOK NOW glow, seat outlining, seat-direction guess, plain-language class labels on the train list.</td></tr>
     <tr><td><code>offscreen.html</code> / <code>offscreen.js</code></td><td>Hidden extension page</td><td>Plays the siren (Web Audio oscillator).</td></tr>
-    <tr><td><code>rail-data.js</code></td><td>Popup, worker, page</td><td>Bundled station list, train names, and each train's release time and zone (EAST 2 PM / WEST 8 AM).</td></tr>
+    <tr><td><code>rail-data.js</code></td><td>Popup, worker, page</td><td>Bundled station list, train names, each train's zone (EAST / WEST, used for the Eid-time check), and the plain-language meaning of every class code (<code>classInfo</code>).</td></tr>
     <tr><td><code>i18n.js</code></td><td>Popup</td><td>English and Bangla text.</td></tr>
   </table></div>
 </section>

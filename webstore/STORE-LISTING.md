@@ -38,6 +38,7 @@ WHAT IT DOES
 • Outlines good seats: middle of the coach, side by side for 2+ tickets, or your own preferred coaches/seats
 • Suggests forward-facing seats first, and shows which way each seat likely faces: forward ⬆ or backward ⬇ (a common rule of thumb, not official)
 • Tells you if another coach has more free seats
+• Explains class codes like S_CHAIR, SNIGDHA and AC_B in plain words
 • Shows whether you're logged in
 • Saved trips and recent run history
 • Full English and Bangla (বাংলা) interface

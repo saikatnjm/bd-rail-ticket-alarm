@@ -37,6 +37,7 @@
     const st = document.createElement("style");
     st.id = "ab-styles";
     st.textContent = `
+      .ab-class-info { display: block; margin-top: 2px; font: 600 11.5px/1.3 system-ui, sans-serif; color: #2f6b53; white-space: normal; }
       .ab-pulse { outline: 4px solid #ffd166 !important; outline-offset: 3px; animation: abPulse 1s infinite; }
       @keyframes abPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,209,102,.9); } 50% { box-shadow: 0 0 0 12px rgba(255,209,102,0); } }
       .ab-hot { border: 2px solid #0b63ff !important; animation: abHot 1.4s ease-in-out infinite; }
@@ -797,6 +798,9 @@
     setStage("found");
     ok(tx(`${found.train} · ${found.cls}: ${found.online} online seats.`,
           `${found.train} · ${found.cls}: ${found.online}টি অনলাইন সিট।`));
+    const what = RAIL_DATA.classLabel(found.cls, cfg?.lang === "bn");
+    setSub(tx(`${found.train} · ${found.cls}: ${found.online} online seats.`, `${found.train} · ${found.cls}: ${found.online}টি অনলাইন সিট।`) +
+           (what ? `\n${found.cls} = ${what}` : ""));
     ok(tx("Click the glowing BOOK NOW → pick the outlined seats → CONTINUE PURCHASE → OTP → pay. (Click anywhere to stop the alarm.)",
           "জ্বলতে থাকা BOOK NOW চাপুন → দাগানো সিট বাছুন → CONTINUE PURCHASE → OTP → পেমেন্ট। (অ্যালার্ম থামাতে যেকোনো জায়গায় ক্লিক করুন।)"));
     sirenOn();
@@ -804,6 +808,33 @@
     if (!shown) warn(tx("Couldn't find the train card on the page — scroll to it yourself.",
                         "পেজে ট্রেনটি খুঁজে পাওয়া যায়নি — নিজে স্ক্রল করে দেখুন।"));
     watchSeatMap();
+  }
+
+  // ---------- class labels ----------
+  // Puts a few plain words ("❄️ 💺 AC chair") under every class name on the
+  // site's train list, with the full meaning on hover. Reads and adds to the page only.
+  function labelClassBoxes() {
+    for (const name of document.querySelectorAll(".seat-class-name")) {
+      if (name.nextElementSibling?.classList.contains("ab-class-info")) continue;
+      const bn = cfg?.lang === "bn";
+      const label = RAIL_DATA.classLabel(name.textContent, bn, true);
+      if (!label) continue;
+      injectStyles();
+      const el = document.createElement("span");
+      el.className = "ab-class-info";
+      el.textContent = label;
+      el.title = RAIL_DATA.classLabel(name.textContent, bn);
+      name.after(el);
+    }
+  }
+
+  function watchClassNames() {
+    let timer = null;
+    new MutationObserver(() => {
+      clearTimeout(timer);
+      timer = setTimeout(labelClassBoxes, 300);
+    }).observe(document.body, { childList: true, subtree: true });
+    labelClassBoxes();
   }
 
   // ---------- train list for the popup dropdown ----------
@@ -929,6 +960,7 @@
     cfg = { ...(stored.config || {}) };
     const d = await chrome.runtime.sendMessage({ type: "getDefaults" }).catch(() => null);
     if (d?.defaults) cfg = { ...d.defaults, ...cfg };
+    watchClassNames();
 
     // Seats just opened and the page reloaded: hand over to the user.
     if (stored.assistFound && Date.now() - stored.assistFound.at < ASSIST_TTL_MS) {

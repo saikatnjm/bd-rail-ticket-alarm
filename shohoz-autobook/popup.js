@@ -227,6 +227,7 @@ for (const i of [1, 2, 3, 4]) {
 }
 
 function refreshFlow() {
+  renderClassInfo();
   const routeOk = validStation($("fromCity").value) && validStation($("toCity").value);
   if (routeOk) scheduleAutoLoad();
   $("cal").classList.toggle("disabled", !routeOk);
@@ -367,6 +368,17 @@ async function loadTrains({ auto = false } = {}) {
   } catch (e) {
     setStatus(t("reachFailed"));
   }
+}
+
+// Says in plain words what each class code means: in the dropdown, and
+// under the field for the classes typed in.
+function renderClassInfo() {
+  const bn = LANG === "bn";
+  for (const o of $("classList").options) o.label = RAIL_DATA.classLabel(o.value, bn);
+  const lines = $("classPriority").value.split(",").map((c) => c.trim().toUpperCase()).filter(Boolean)
+    .map((c) => [c, RAIL_DATA.classLabel(c, bn)]).filter(([, l]) => l)
+    .map(([c, l]) => `${c} = ${l}`);
+  $("classInfo").textContent = lines.length ? lines.join("\n") : t("classLegend");
 }
 
 // ---------- config ----------
@@ -648,6 +660,7 @@ $("trainSelect").addEventListener("change", () => {
 });
 $("trainQuery").addEventListener("change", () => { saveConfig(); refreshFlow(); });
 $("trainQuery").addEventListener("input", refreshTrainInfo);
+$("classPriority").addEventListener("input", renderClassInfo);
 $("loadTrains").onclick = () => loadTrains();
 
 // Load the route's trains by itself once both stations are picked, unless a

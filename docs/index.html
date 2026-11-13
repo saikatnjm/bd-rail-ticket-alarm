@@ -102,6 +102,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     <div class="card"><h3>✨ Lights up BOOK NOW</h3><p>The page jumps to your train and its BOOK NOW button glows yellow.</p></div>
     <div class="card"><h3>🪑 Outlines good seats</h3><p>In the seat map it rings good seats in pulsing blue — the rows beside the coach's middle gap, side by side (never across the aisle) if you need two or more.</p></div>
     <div class="card hl"><h3>🧭 Which way will it face? <span class="new">New</span></h3><p>Each suggested seat gets an arrow: <span class="arrow">⬆ forward</span> or <span class="arrow">⬇ backward</span>. On Cox's Bazar trips it shows <span class="arrow">⬆→⬇</span> because the train turns around at Chattogram. It's a well-known rule of thumb, not official. <a href="#facing">How it guesses</a></p></div>
+    <div class="card hl"><h3>🎫 Explains class codes <span class="new">New</span></h3><p>Codes like <code>S_CHAIR</code>, <code>SNIGDHA</code> or <code>AC_B</code> get plain words on the ticket site and in the panel: AC or not, berth to sleep on or seat. <a href="#classes">All 10 codes</a></p></div>
     <div class="card"><h3>🛡️ Gentle on the server</h3><p>About one check per second, only after release, stops early, slows down when asked. Never touches the bot check.</p></div>
   </div>
   <figure><img src="img/screenshot-1.png" alt="The extension panel with a countdown to the next ticket release"><figcaption>The panel: route, date, train, seats — and a countdown to release time.</figcaption></figure>
@@ -159,7 +160,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     <li><b>Route.</b> Type the From and To stations and pick them from the suggestions.</li>
     <li><b>Date.</b> Tap your travel date. The line underneath says when those tickets go on sale.</li>
     <li><b>Train.</b> The route's trains load by themselves once both stations are picked (press <b>⟳ Load trains</b> to refresh). Pick yours — the list shows departure → arrival times, and days a train doesn't run, like “not on Wednesday”. The check times are set for you: 8 AM on the opening day, plus 2 PM as a backup for East trains.</li>
-    <li><b>Seats &amp; class.</b> Choose the class (for example <code>S_CHAIR</code>), how many seats (1–4), and optionally preferred coaches (<code>THA,TA</code>) or exact seats (<code>THA-21,THA-22</code>).</li>
+    <li><b>Seats &amp; class.</b> Choose the class (for example <code>S_CHAIR</code>), how many seats (1–4), and optionally preferred coaches (<code>THA,TA</code>) or exact seats (<code>THA-21,THA-22</code>). Not sure what a code means? The panel tells you, or see <a href="#classes">the class codes</a>.</li>
     <li><b>ARM.</b> Press <b>ARM</b>. The button turns red and a green card counts down. You can close the panel now.</li>
   </ol>
   <div class="note"><b>Try it first.</b> Pick a date that's already on sale and press <b>▶ Test run now</b>. You'll hear the alarm and see BOOK NOW light up, so nothing surprises you on the real day.</div>
@@ -235,6 +236,35 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     the coach attendant. If you'd rather choose by yourself, type exact seats in the panel; those always come first.</div>
 </section>
 
+<section id="classes">
+  <h2>🎫 What do the class codes mean? <span class="new">New</span></h2>
+  <p>The ticket site shows short codes like <code>S_CHAIR</code> or <code>AC_B</code>. Here's what each one is.
+     The extension now explains them for you in three places:</p>
+  <ul>
+    <li><b>On the ticket site:</b> a few plain words under every class name on the train list, like <i>❄️ 💺 AC chair</i>. Hover for the full meaning.</li>
+    <li><b>In the panel:</b> the class list shows each code's meaning, and the line under the field explains the classes you picked.</li>
+    <li><b>In the helper box:</b> when seats open, it says what the class you're booking actually is.</li>
+  </ul>
+  <p><b>Quick rule:</b> <b>BERTH</b> = a bed to sleep on (🛏️), <b>SEAT</b> or <b>CHAIR</b> = you sit (💺). <b>AC</b> and <b>SNIGDHA</b> are air-conditioned (❄️).
+     <b>F_</b> means first class.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Code</th><th>AC?</th><th>Sleep or sit</th><th>Where</th><th>Good to know</th></tr>
+    <tr><td><code>AC_B</code><br>AC Berth</td><td>❄️ Yes</td><td>🛏️ Berth (sleep)</td><td>Cabin</td><td>Bedding given. The comfiest choice for night trains.</td></tr>
+    <tr><td><code>AC_S</code><br>AC Seat</td><td>❄️ Yes</td><td>💺 Seat</td><td>Cabin</td><td>The same AC berth cabins, sold as seats. No bedding.</td></tr>
+    <tr><td><code>SNIGDHA</code><br>Snigdha</td><td>❄️ Yes</td><td>💺 Chair</td><td>Open coach</td><td>The usual AC chair class.</td></tr>
+    <tr><td><code>AC_CHAIR</code><br>AC Chair</td><td>❄️ Yes</td><td>💺 Chair</td><td>Open coach</td><td>An AC chair coach, much like Snigdha. Guides rarely mention this code.</td></tr>
+    <tr><td><code>F_BERTH</code><br>First Berth</td><td>No</td><td>🛏️ Berth (sleep)</td><td>Cabin</td><td>Non-AC sleeping cabin for night trains. Bedding may or may not be given.</td></tr>
+    <tr><td><code>F_SEAT</code><br>First Seat</td><td>No</td><td>💺 Seat</td><td>Cabin</td><td>The same first-class cabins, sold as seats.</td></tr>
+    <tr><td><code>F_CHAIR</code><br>First Chair</td><td>No</td><td>💺 Chair</td><td>Open coach</td><td>Better chairs than Shovan chair, no cabin.</td></tr>
+    <tr><td><code>S_CHAIR</code><br>Shovan Chair</td><td>No</td><td>💺 Chair</td><td>Open coach</td><td>The common non-AC class on intercity trains. Numbered seats.</td></tr>
+    <tr><td><code>SHOVAN</code><br>Shovan</td><td>No</td><td>💺 Seat</td><td>Open coach</td><td>More basic seating, cheaper than Shovan chair.</td></tr>
+    <tr><td><code>SHULOV</code><br>Shulov</td><td>No</td><td>💺 Bench</td><td>Open coach</td><td>Cheapest. Plain benches, mostly on local and mail trains.</td></tr>
+  </table></div>
+  <p class="small">Not every train has every class. The codes are Bangladesh Railway's own. The meanings come from travel guides
+     (<a href="https://www.seat61.com/Bangladesh.htm">Seat61</a>, <a href="https://www.bdrailwayinfo.org/seat-information">bdrailwayinfo.org</a>)
+     and a Bangla explainer video, which agree on all but <code>AC_CHAIR</code>. Fares change, so check the price on the site.</p>
+</section>
+
 <section id="buttons">
   <h2>Buttons</h2>
   <div class="tablewrap"><table>
@@ -292,6 +322,8 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     <p>No. You log in on the website yourself. The extension only uses the login session the website already keeps in your browser, and only to talk to the ticket website. See <a href="privacy.html">Privacy</a>.</p></details>
   <details><summary>Does it guarantee a ticket?</summary>
     <p>No. Popular trains sell out in seconds and thousands of people try at once. It saves you the seconds of noticing and finding your train — the rest depends on you and on luck.</p></details>
+  <details><summary>What do S_CHAIR, SNIGDHA, AC_B and the other codes mean?</summary>
+    <p>BERTH means a bed to sleep on, SEAT or CHAIR means you sit, and AC or SNIGDHA means air-conditioned. The extension writes the meaning under each class on the ticket site and in the panel. See <a href="#classes">the full list</a>.</p></details>
   <details><summary>Can it tell which seats face forward?</summary>
     <p>It guesses, suggests forward-facing seats first, and shows the guess as an arrow next to each suggested seat (⬆ forward, ⬇ backward, ⬆→⬇ when the train
        turns around at Chattogram). It uses a common rule of thumb, not official data, so check when you board.
