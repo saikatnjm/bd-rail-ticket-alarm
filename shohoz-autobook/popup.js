@@ -38,7 +38,7 @@ function applyLang() {
   for (const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = t(el.dataset.i18nPh);
   const auto = $("triggerTime").querySelector('option[value="auto"]');
   if (auto) auto.textContent = t("autoOpt");
-  if (routeTrains.length) fillTrainSelect(routeTrains, null);
+  if (routeTrains.length) fillTrainSelect(routeTrains, null, routeTrainsKey);
   renderCal();
   refreshFlow();
   refreshArmState();
@@ -159,6 +159,19 @@ function fmtTime12(hhmmss) {
 }
 
 let routeTrains = []; // last loaded/cached train list for the current route
+let routeTrainsKey = ""; // the route that list belongs to
+let droppedTrain = ""; // a train just removed because it isn't on this route
+
+// The route's train that a typed name or number points at, if any.
+function routeTrainFor(q) {
+  const n = (x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, "");
+  return routeTrains.find((x) => n(x.name).includes(n(q))) || null;
+}
+// False only when the route's trains are known and the typed one isn't among them.
+function trainOnRoute() {
+  const q = $("trainQuery").value.trim();
+  return !q || !routeTrains.length || !!routeTrainFor(q);
+}
 
 function resolveReleaseTime() {
   const override = $("triggerTime").value;
@@ -258,10 +271,16 @@ function refreshTrainInfo() {
   const name = $("trainQuery").value.trim() || $("trainSelect").value;
   const el = $("trainInfo");
   const info = trainReleaseInfo(name);
+  if (name) droppedTrain = "";
   if (!name) {
     const rel = resolveReleaseTime();
-    el.textContent = t("noTrainPicked", { t: rel.label, src: rel.src });
-    el.style.color = "#7fae95";
+    el.textContent = droppedTrain ? t("trainNotOnRoute", { train: droppedTrain }) : t("noTrainPicked", { t: rel.label, src: rel.src });
+    el.style.color = droppedTrain ? "#ffd166" : "#7fae95";
+    return;
+  }
+  if (!trainOnRoute()) {
+    el.textContent = t("trainNotOnRouteWarn");
+    el.style.color = "#ffd166";
     return;
   }
   if (!info) {
@@ -297,13 +316,14 @@ function routeKey() {
   return `${$("fromCity").value.trim()}|${$("toCity").value.trim()}`;
 }
 
-function fillTrainSelect(trains, doj) {
+function fillTrainSelect(trains, doj, key = routeKey()) {
   routeTrains = trains || [];
+  routeTrainsKey = key;
   const sel = $("trainSelect");
   sel.innerHTML = "";
   const none = document.createElement("option");
   none.value = "";
-  none.textContent = t("anyTrain");
+  none.textContent = t(routeTrains.length ? "anyTrain" : "loadFirst");
   sel.appendChild(none);
   for (const x of routeTrains) {
     const o = document.createElement("option");
@@ -315,10 +335,17 @@ function fillTrainSelect(trains, doj) {
     o.textContent = x.name + times + (off ? t("offDayTag", { days: off }) : ""); // release time lives in the info line only
     sel.appendChild(o);
   }
-  sel.disabled = false;
+  sel.disabled = !routeTrains.length;
   if (doj) setStatus(t("trainsLoaded", { n: routeTrains.length, doj }));
   const q = $("trainQuery").value.trim();
-  if (q) sel.value = [...sel.options].some((o) => o.value === q) ? q : "";
+  if (!q || !routeTrains.length) return;
+  const hit = routeTrainFor(q);
+  if (hit) { sel.value = hit.name; return; }
+  // A train left over from another route would never be found on this one.
+  $("trainQuery").value = "";
+  droppedTrain = q;
+  saveConfig();
+  refreshFlow();
 }
 
 async function loadCachedTrains() {
@@ -672,9 +699,11 @@ function scheduleAutoLoad() {
   autoLoadTimer = setTimeout(async () => {
     if (!validStation($("fromCity").value) || !validStation($("toCity").value)) return;
     const key = routeKey();
-    if (autoLoadedKey === key) return;
     const { trainCache } = await chrome.storage.local.get("trainCache");
     const entry = trainCache?.[key];
+    // The list on screen must be this route's, never the previous route's.
+    if (routeTrainsKey !== key) fillTrainSelect(entry?.trains || [], null);
+    if (autoLoadedKey === key) return;
     const fresh = entry && Date.now() - entry.at < TRAIN_CACHE_MAX_AGE_MS && entry.trains?.every((x) => Array.isArray(x.offDays));
     autoLoadedKey = key;
     if (!fresh) loadTrains({ auto: true });
@@ -712,6 +741,7 @@ $("arm").onclick = async () => {
       return;
     }
     if (!$("journeyDate").value) { setStatus(t("pickDate")); return; }
+    if (!trainOnRoute()) { setStatus(t("trainNotOnRouteWarn")); return; }
     const res = await chrome.runtime.sendMessage({ type: "arm" });
     if (res.ok) setStatus(t("armedFor", { when: new Date(res.trigger).toLocaleString(LANG === "bn" ? "bn-BD" : undefined) }));
     else setStatus(t("couldNotArm", { e: res.error || "?" }));
@@ -722,6 +752,7 @@ $("arm").onclick = async () => {
 $("runNow").onclick = async () => {
   await saveConfig();
   if (!$("journeyDate").value) { setStatus(t("pickDateFirst")); return; }
+  if (!trainOnRoute()) { setStatus(t("trainNotOnRouteWarn")); return; }
   await chrome.runtime.sendMessage({ type: "runNow" });
   setStatus(t("launching"));
   window.close();

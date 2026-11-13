@@ -39,6 +39,7 @@ WHAT IT DOES
 • Suggests forward-facing seats first, and shows which way each seat likely faces: forward ⬆ or backward ⬇ (a common rule of thumb, not official)
 • Tells you if another coach has more free seats
 • Explains class codes like S_CHAIR, SNIGDHA and AC_B in plain words
+• Marks single and double cabins on the seat map of cabin classes
 • Shows whether you're logged in
 • Saved trips and recent run history
 • Full English and Bangla (বাংলা) interface

@@ -48,6 +48,15 @@
       .ab-capped { padding-bottom: 40px !important; }
       .ab-class-info { display: none !important; } /* in-box labels from 1.5.3, if a tab still has them */
       .ab-trip-capped { interpolate-size: allow-keywords; }
+      .ab-rel { position: relative !important; }
+      .ab-cabins { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+      .ab-cabin { position: absolute; box-sizing: border-box; border-radius: 16px;
+        border: 1.5px dashed rgba(0,103,71,.38); background: rgba(0,103,71,.035); }
+      .ab-cabin-tag { position: absolute; left: 12px; top: -10px; padding: 2px 9px; border-radius: 999px; white-space: nowrap;
+        font: 600 10.5px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif; letter-spacing: .01em;
+        background: #e8f3ee; color: #0b5c40; border: 1px solid #b9dccb; }
+      .ab-cabin-single { border-color: rgba(109,74,255,.42); background: rgba(109,74,255,.04); }
+      .ab-cabin-single .ab-cabin-tag { background: #efeaff; color: #4b2fd6; border-color: #d2c6ff; }
       .trip-collapsed.ab-trip-capped { height: auto !important; }
       .ab-pulse { outline: 4px solid #ffd166 !important; outline-offset: 3px; animation: abPulse 1s infinite; }
       @keyframes abPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,209,102,.9); } 50% { box-shadow: 0 0 0 12px rgba(255,209,102,0); } }
@@ -124,6 +133,7 @@
       seatmap: [tx("🪑 Pick the seats ringed in blue", "🪑 নীল দাগের সিটগুলো বাছুন"), "#6fe3a5"],
       coachfull: [tx("⛔ No free seat in this coach", "⛔ এই বগিতে খালি সিট নেই"), "#ffd166"],
       fail: [tx("❌ Did not succeed — open details", "❌ হয়নি — বিস্তারিত দেখুন"), "#ff6b6b"],
+      wrongtrain: [tx("❌ That train isn't on this route", "❌ এই রুটে এই ট্রেন নেই"), "#ff6b6b"],
       stopped: [tx("■ Stopped", "■ থামানো হয়েছে"), "#ff6b6b"],
     };
     const [text, color] = map[stage] || [stage, "#9adbb8"];
@@ -521,6 +531,129 @@
               `\n🧭 অনুমান, অফিসিয়াল নয়: ${parts.join("; ")}। ট্রেনে উঠে সিটের পিঠ দেখে নিশ্চিত হন।`);
   }
 
+  // ---------- seat map: shared helpers ----------
+  const SEAT_TAKEN = /booked|hidden|selected|progress|blocked|disable|reserved/i;
+  const isFreeSeat = (b) => !SEAT_TAKEN.test(b.className) && !b.disabled;
+  function seatButtons() {
+    return [...document.querySelectorAll("button.btn-seat")]
+      .filter((b) => /^[A-Z]{1,5}-\d{1,3}$/.test((b.textContent || "").trim()));
+  }
+  // The class whose seat map is open: the class box the user clicked.
+  function openClass(nearEl) {
+    const el = nearEl?.closest("app-single-trip")?.querySelector(".single-seat-class.selected .seat-class-name") ||
+      document.querySelector(".single-seat-class.selected .seat-class-name");
+    return (el?.textContent || "").trim().toUpperCase();
+  }
+
+  // ---------- cabins ----------
+  // AC_B / AC_S / F_BERTH / F_SEAT coaches are split into cabins. On the seat
+  // map a cabin is a tight group of seats with empty space above and below.
+  // Per travel guides a double cabin sleeps 4 (sold as 6 seats by day) and a
+  // single cabin sleeps 2 (3 seats by day). A group of any other size is left
+  // unlabelled rather than guessed at.
+  const BERTH_CABINS = { 4: "double", 2: "single" }, SEAT_CABINS = { 6: "double", 3: "single" };
+  const CABIN_KIND = { AC_B: BERTH_CABINS, F_BERTH: BERTH_CABINS, AC_S: SEAT_CABINS, F_SEAT: SEAT_CABINS };
+
+  function findCabins(btns) {
+    const kinds = btns.length ? CABIN_KIND[openClass(btns[0])] : null;
+    if (!kinds) return [];
+    const items = btns.map((el) => ({ el, r: el.getBoundingClientRect() })).filter((s) => s.r.width && s.r.height);
+    if (!items.length) return [];
+    const hs = items.map((s) => s.r.height).sort((a, b) => a - b);
+    const seatH = hs[hs.length >> 1];
+    const rows = [];
+    for (const s of items.sort((a, b) => a.r.top - b.r.top)) {
+      const y = s.r.top + s.r.height / 2;
+      const row = rows.find((r) => Math.abs(r.y - y) < seatH / 2);
+      if (row) row.seats.push(s); else rows.push({ y, seats: [s] });
+    }
+    // A new cabin starts where about a whole row's worth of space is left empty.
+    const cabins = [];
+    let lastY = null;
+    for (const row of rows) {
+      if (lastY === null || row.y - lastY > seatH * 1.9) cabins.push([]);
+      cabins[cabins.length - 1].push(...row.seats);
+      lastY = row.y;
+    }
+    return cabins.map((seats) => ({ seats, kind: kinds[seats.length] || null, berth: kinds === BERTH_CABINS }));
+  }
+
+  function cabinText(cab, free) {
+    const n = cab.seats.length;
+    const bnNum = (x) => x.toLocaleString("bn-BD");
+    const size = cab.berth ? tx(`${n} berths`, `${bnNum(n)} বার্থ`) : tx(`${n} seats`, `${bnNum(n)} সিট`);
+    const name = cab.kind === "single" ? tx("Single cabin", "সিঙ্গেল কেবিন") : tx("Double cabin", "ডাবল কেবিন");
+    if (free === undefined) return `${name} (${size})`;
+    return `${name} · ${size} · ${free ? tx(`${free} free`, `${bnNum(free)}টি খালি`) : tx("full", "খালি নেই")}`;
+  }
+
+  // Draws a dashed outline with a "Single cabin · 3 seats · 1 free" tag around
+  // every cabin of the open seat map. Runs whenever a cabin-class seat map is
+  // on screen; it only reads the map and adds the outlines.
+  function labelCabins() {
+    const btns = seatButtons();
+    const box = btns.length ? seatMapBox(btns) : null;
+    const cabins = box ? findCabins(btns).filter((c) => c.kind) : [];
+    const old = document.querySelector(".ab-cabins");
+    if (!cabins.length) { old?.remove(); return; }
+    const c = box.getBoundingClientRect(), PAD = 8;
+    const frames = cabins.map((cab) => {
+      const rs = cab.seats.map((s) => s.r);
+      const left = Math.min(...rs.map((r) => r.left)), top = Math.min(...rs.map((r) => r.top));
+      return {
+        x: Math.round(left - c.left - box.clientLeft + box.scrollLeft - PAD),
+        y: Math.round(top - c.top - box.clientTop + box.scrollTop - PAD),
+        w: Math.round(Math.max(...rs.map((r) => r.right)) - left + PAD * 2),
+        h: Math.round(Math.max(...rs.map((r) => r.bottom)) - top + PAD * 2),
+        kind: cab.kind,
+        text: cabinText(cab, cab.seats.filter((s) => isFreeSeat(s.el)).length),
+      };
+    });
+    // Redraw only when something changed, so our own outlines don't re-trigger us.
+    const sig = JSON.stringify(frames);
+    if (old && old.parentElement === box && old.dataset.sig === sig) return;
+    old?.remove();
+    injectStyles();
+    if (getComputedStyle(box).position === "static") box.classList.add("ab-rel");
+    const layer = document.createElement("div");
+    layer.className = "ab-cabins";
+    layer.dataset.sig = sig;
+    for (const f of frames) {
+      const el = document.createElement("div");
+      el.className = "ab-cabin ab-cabin-" + f.kind;
+      el.style.cssText = `left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`;
+      const tag = document.createElement("span");
+      tag.className = "ab-cabin-tag";
+      tag.textContent = f.text;
+      el.appendChild(tag);
+      layer.appendChild(el);
+    }
+    box.appendChild(layer);
+  }
+
+  // For 2+ tickets in a cabin class: seats in one cabin beat seats that merely
+  // have neighbouring numbers. Single cabins first (fewer strangers), then the
+  // cabin nearest the middle; inside it, side-by-side seats if there are any.
+  function pickInCabin(cabins, seats, count) {
+    const byEl = new Map(seats.map((s) => [s.el, s]));
+    const mid = (cabins.length - 1) / 2;
+    const options = cabins
+      .map((cab, i) => ({ cab, i, free: cab.seats.filter((s) => isFreeSeat(s.el)) }))
+      .filter((o) => o.free.length >= count)
+      .sort((a, b) => (a.cab.kind === "single" ? 0 : 1) - (b.cab.kind === "single" ? 0 : 1) ||
+        Math.abs(a.i - mid) - Math.abs(b.i - mid));
+    if (!options.length) return null;
+    const free = options[0].free.slice().sort((a, b) => a.r.top - b.r.top || a.r.left - b.r.left);
+    let block = free.slice(0, count);
+    for (let i = 0; i + count <= free.length; i++) {
+      const b = free.slice(i, i + count);
+      const sameRow = b.every((s) => Math.abs(s.r.top - b[0].r.top) < s.r.height / 2);
+      const together = b.every((s, k) => k === 0 || s.r.left - b[k - 1].r.right < s.r.width * 0.6);
+      if (sameRow && together) { block = b; break; }
+    }
+    return block.map((s) => byEl.get(s.el)).filter(Boolean);
+  }
+
   // Outlines the best free seats in the seat map the user opened.
   let lastSuggestion = "";
   function seatMapBox(btns) {
@@ -530,9 +663,7 @@
   }
 
   function suggestSeats() {
-    const BAD = /booked|hidden|selected|progress|blocked|disable|reserved/i;
-    const btns = [...document.querySelectorAll("button.btn-seat")]
-      .filter((b) => /^[A-Z]{1,5}-\d{1,3}$/.test((b.textContent || "").trim()));
+    const btns = seatButtons();
     if (btns.length === 0) return;
     injectStyles();
     ensureOverlay();
@@ -540,14 +671,18 @@
 
     const seats = btns.map((b) => ({
       seat_number: b.textContent.trim(),
-      seat_availability: !BAD.test(b.className) && !b.disabled ? 1 : 0,
+      seat_availability: isFreeSeat(b) ? 1 : 0,
       el: b,
     }));
     const want = Number(cfg.seatCount) || 1;
     const favFree = (cfg.preferredSeats || "").split(",").map((c) => c.trim().toUpperCase())
       .some((f) => seats.some((s) => s.seat_availability && s.seat_number.toUpperCase() === f));
     const numOf = (n) => parseInt(n.split("-").pop(), 10) || 0;
-    const prefer = forwardHalf();
+    // In a cabin the seats face each other (or are berths), so the
+    // forward-facing half of the coach means nothing there.
+    const cabins = findCabins(btns);
+    const cabinCls = !!CABIN_KIND[openClass(btns[0])];
+    const prefer = cabinCls ? null : forwardHalf();
     // Without a measurable map, split the coach by seat number instead.
     const numHalf = (s) => {
       const coach = s.seat_number.split("-")[0];
@@ -555,7 +690,8 @@
       return numOf(s.seat_number) <= top / 2 ? 1 : 2;
     };
     const byNumber = (list) => scoreAndPick(list, want, cfg.preferredCoaches || "", cfg.preferredSeats || "").picked;
-    let picked = !favFree && pickByLayout(seats, want, cfg.preferredCoaches || "", prefer);
+    let picked = !favFree && want > 1 && cabins.length ? pickInCabin(cabins, seats, want) : null;
+    if (!picked?.length) picked = !favFree && pickByLayout(seats, want, cfg.preferredCoaches || "", prefer);
     if (!picked && prefer && !favFree) {
       const fwd = byNumber(seats.filter((s) => numHalf(s) === prefer));
       if (fwd.length === want) picked = fwd;
@@ -563,7 +699,7 @@
     if (!picked) picked = byNumber(seats);
     for (const s of picked) {
       if (!s.half) s.half = numHalf(s);
-      s.facing = facingGuess(s.half);
+      s.facing = cabinCls ? null : facingGuess(s.half);
     }
     for (const s of picked) s.el.classList.add("ab-suggest");
 
@@ -601,6 +737,20 @@
         text += tx(`\n👉 Emptier coach: ${best.name} (${best.free} free)`, `\n👉 বেশি খালি বগি: ${best.name} (${best.free}টি খালি)`);
       }
       text += facingText(picked);
+      if (cabinCls) {
+        const own = picked.map((s) => cabins.find((cab) => cab.seats.some((x) => x.el === s.el)));
+        if (own[0]?.kind && own.every((cab) => cab === own[0])) {
+          text += picked.length > 1
+            ? tx(`\n🚪 All in one cabin: ${cabinText(own[0])}`, `\n🚪 সব একই কেবিনে: ${cabinText(own[0])}`)
+            : `\n🚪 ${cabinText(own[0])}`;
+        } else if (picked.length > 1 && cabins.length) {
+          text += tx(`\n⚠ No cabin has ${want} free seats, so these are in different cabins.`,
+                     `\n⚠ কোনো কেবিনে ${want.toLocaleString("bn-BD")}টি খালি সিট নেই, তাই এগুলো আলাদা কেবিনে।`);
+        }
+        if (cabins[0] && !cabins[0].berth) {
+          text += tx("\nThe two rows in a cabin face each other.", "\nকেবিনের দুই সারির সিট মুখোমুখি।");
+        }
+      }
       if (prefer && !favFree && picked.some((s) => s.half !== prefer)) {
         text += tx(`\n(No ${want > 1 ? "side-by-side " : ""}forward-facing seats free in this coach.)`,
                    `\n(এই বগিতে ${want > 1 ? "পাশাপাশি " : ""}সামনের দিকে মুখ করা খালি সিট নেই।)`);
@@ -638,6 +788,20 @@
     suggestSeats();
   }
 
+  // The chosen train isn't among this route's trains (usually one left over
+  // from another route): say so plainly instead of searching for it.
+  function failWrongTrain(names, thisDateOnly) {
+    setStage("wrongtrain");
+    recordRun("no_train", cfg.trainQuery);
+    const list = names.slice(0, 6).join(", ") + (names.length > 6 ? ", …" : "");
+    const when = thisDateOnly ? tx(" on this date", "এই তারিখে ") : "";
+    err(tx(`"${cfg.trainQuery}" doesn't run ${cfg.fromCity} → ${cfg.toCity}${when}. Open the Ticket Alarm panel and pick one of: ${list}`,
+           `"${cfg.trainQuery}" ${when}${cfg.fromCity} → ${cfg.toCity} রুটে চলে না। টিকিট অ্যালার্ম প্যানেল খুলে এগুলোর একটি বাছুন: ${list}`));
+    notify(tx("Ticket Alarm: wrong train for this route", "টিকিট অ্যালার্ম: এই রুটে এই ট্রেন নেই"),
+           tx(`"${cfg.trainQuery}" doesn't run ${cfg.fromCity} → ${cfg.toCity}. Pick a train from the panel.`,
+              `"${cfg.trainQuery}" ${cfg.fromCity} → ${cfg.toCity} রুটে চলে না। প্যানেল থেকে ট্রেন বাছুন।`));
+  }
+
   // ---------- main engine ----------
   async function runEngine() {
     if (engineStarted) return;
@@ -658,6 +822,17 @@
     const doj = mission.doj;
     ok(`mission: ${cfg.fromCity} → ${cfg.toCity} on ${doj}`);
     ok(`train: "${cfg.trainQuery || "(first with seats)"}" class: ${cfg.classPriority}`);
+
+    // The panel saves each route's trains (two weekdays merged, so off-day
+    // trains are in it). A train that isn't in that list can't turn up here.
+    if (cfg.trainQuery) {
+      const { trainCache } = await chrome.storage.local.get("trainCache");
+      const known = trainCache?.[`${String(cfg.fromCity).trim()}|${String(cfg.toCity).trim()}`]?.trains;
+      if (known?.length && !known.some((x) => norm(x.name).includes(norm(cfg.trainQuery)))) {
+        failWrongTrain(known.map((x) => x.name));
+        return;
+      }
+    }
 
     // When can this journey date go on sale at the earliest? The opening day
     // is D - 10 and no train opens before 8 AM (the date itself shows up at
@@ -702,6 +877,7 @@
     };
 
     let train = null, seatType = null, attempt = 0, consecutive429 = 0;
+    let unmatched = 0, wrongNames = null; // polls that listed trains, but not the chosen one
     setStage("search");
     ok(tx("GO — polling for trains…", "শুরু — ট্রেন খোঁজা হচ্ছে…"));
     while (Date.now() < deadline && !aborted) {
@@ -712,6 +888,9 @@
           const trains = json?.data?.trains || json?.data || [];
           const n = Array.isArray(trains) ? trains.length : 0;
           const t = matchTrain(trains, cfg.trainQuery);
+          unmatched = !t && n > 0 ? unmatched + 1 : 0;
+          // Other trains have been on sale for a while and this one never showed up.
+          if (unmatched >= 30) { wrongNames = trains.map((x) => x.trip_number || x.train_name); break; }
           if (t) {
             const st = pickSeatType(t, cfg.classPriority);
             if (st) { train = t; seatType = st; break; }
@@ -730,7 +909,9 @@
               warn(`no trains listed${relNote}`);
             } else {
               const names = trains.slice(0, 5).map((x) => x.trip_number || x.train_name).join(", ");
-              warn(`${n} trains listed but none match "${cfg.trainQuery}" (${names}${n > 5 ? ", …" : ""})`);
+              const more = n > 5 ? ", …" : "";
+              warn(tx(`"${cfg.trainQuery}" isn't among the ${n} trains listed for this route and date (${names}${more}). Still checking…`,
+                      `এই রুট ও তারিখের ${n}টি ট্রেনের মধ্যে "${cfg.trainQuery}" নেই (${names}${more})। এখনো দেখছি…`));
             }
           }
         } else if (status === 401) {
@@ -764,6 +945,7 @@
       err(tx("Run stopped.", "থামানো হয়েছে।"));
       return;
     }
+    if (wrongNames) { failWrongTrain(wrongNames, true); return; }
     if (!train) {
       setStage("fail");
       recordRun("no_train");
@@ -844,13 +1026,16 @@
     }
   }
 
-  function watchClassNames() {
+  // Class pills and cabin outlines are kept up to date on every page.
+  function watchPage() {
     let timer = null;
+    const run = () => { labelClassBoxes(); labelCabins(); };
     new MutationObserver(() => {
       clearTimeout(timer);
-      timer = setTimeout(labelClassBoxes, 300);
+      timer = setTimeout(run, 300);
     }).observe(document.body, { childList: true, subtree: true });
-    labelClassBoxes();
+    window.addEventListener("resize", labelCabins);
+    run();
   }
 
   // ---------- train list for the popup dropdown ----------
@@ -976,7 +1161,7 @@
     cfg = { ...(stored.config || {}) };
     const d = await chrome.runtime.sendMessage({ type: "getDefaults" }).catch(() => null);
     if (d?.defaults) cfg = { ...d.defaults, ...cfg };
-    watchClassNames();
+    watchPage();
 
     // Seats just opened and the page reloaded: hand over to the user.
     if (stored.assistFound && Date.now() - stored.assistFound.at < ASSIST_TTL_MS) {

@@ -6,7 +6,7 @@
   const rel2 = new Date(rel); rel2.setHours(14, 0, 0, 0);
   const store = {
     config: {
-      fromCity: "Dhaka", toCity: "Chattogram", trainQuery: "SUBORNO EXPRESS (702)",
+      fromCity: "Dhaka", toCity: "Chattogram", trainQuery: q.get("train") || "SUBORNO EXPRESS (702)",
       classPriority: "S_CHAIR", seatCount: 2, preferredCoaches: "", preferredSeats: "",
       journeyDate: "2026-11-13", triggerTime: "auto", pollIntervalMs: 700, maxWaitMinutes: 5,
       autoReleaseTime: true, lang: q.get("lang") === "bn" ? "bn" : "en",
@@ -17,6 +17,9 @@
       { name: "SUBORNO EXPRESS (702)", departure: "04:30 PM", arrival: "09:10 PM" },
       { name: "SONAR BANGLA EXPRESS (787)", departure: "07:00 AM", arrival: "12:10 PM" },
       { name: "TURNA (741)", departure: "11:30 PM", arrival: "06:30 AM" },
+    ] }, "Dhaka|Cox's Bazar": { at: Date.now(), trains: [
+      { name: "PARJOTAK EXPRESS (816)", departure: "06:15 AM", arrival: "03:00 PM", offDays: [3] },
+      { name: "COXS BAZAR EXPRESS (814)", departure: "11:00 PM", arrival: "07:20 AM", offDays: [] },
     ] } },
     runHistory: [
       { at: Date.now() - 86400000, doj: "2026-11-12", train: "SUBORNO (702)", outcome: "found", detail: "" },

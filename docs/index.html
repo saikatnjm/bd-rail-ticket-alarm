@@ -102,7 +102,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     <div class="card"><h3>✨ Lights up BOOK NOW</h3><p>The page jumps to your train and its BOOK NOW button glows yellow.</p></div>
     <div class="card"><h3>🪑 Outlines good seats</h3><p>In the seat map it rings good seats in pulsing blue — the rows beside the coach's middle gap, side by side (never across the aisle) if you need two or more.</p></div>
     <div class="card hl"><h3>🧭 Which way will it face? <span class="new">New</span></h3><p>Each suggested seat gets an arrow: <span class="arrow">⬆ forward</span> or <span class="arrow">⬇ backward</span>. On Cox's Bazar trips it shows <span class="arrow">⬆→⬇</span> because the train turns around at Chattogram. It's a well-known rule of thumb, not official. <a href="#facing">How it guesses</a></p></div>
-    <div class="card hl"><h3>🎫 Explains class codes <span class="new">New</span></h3><p>Codes like <code>S_CHAIR</code>, <code>SNIGDHA</code> or <code>AC_B</code> get a plain-words pill under each class box on the ticket site, and meanings in the panel: AC or not, sleeper or seat. <a href="#classes">All 10 codes</a></p></div>
+    <div class="card hl"><h3>🎫 Explains class codes <span class="new">New</span></h3><p>Codes like <code>S_CHAIR</code>, <code>SNIGDHA</code> or <code>AC_B</code> get a plain-words pill under each class box on the ticket site, and meanings in the panel: AC or not, sleeper or seat. On cabin classes the seat map also marks each <b>single or double cabin</b>. <a href="#classes">All 10 codes</a></p></div>
     <div class="card"><h3>🛡️ Gentle on the server</h3><p>About one check per second, only after release, stops early, slows down when asked. Never touches the bot check.</p></div>
   </div>
   <figure><img src="img/screenshot-1.png" alt="The extension panel with a countdown to the next ticket release"><figcaption>The panel: route, date, train, seats — and a countdown to release time.</figcaption></figure>
@@ -260,6 +260,20 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     <tr><td><code>SHOVAN</code><br>Shovan</td><td>No</td><td>💺 Seat</td><td>Open coach</td><td>More basic seating, cheaper than Shovan chair.</td></tr>
     <tr><td><code>SHULOV</code><br>Shulov</td><td>No</td><td>💺 Bench</td><td>Open coach</td><td>Cheapest. Plain benches, mostly on local and mail trains.</td></tr>
   </table></div>
+  <h3>Cabin classes: single or double cabin?</h3>
+  <p><code>AC_B</code>, <code>AC_S</code>, <code>F_BERTH</code> and <code>F_SEAT</code> coaches are split into cabins.
+     When you open the seat map of one of these, the extension draws a dashed outline around every cabin and tags it,
+     for example <i>Single cabin · 3 seats · 1 free</i>.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Cabin</th><th>By day (<code>AC_S</code>, <code>F_SEAT</code>)</th><th>By night (<code>AC_B</code>, <code>F_BERTH</code>)</th><th>Outline</th></tr>
+    <tr><td><b>Single cabin</b></td><td>3 seats</td><td>2 berths</td><td>Purple</td></tr>
+    <tr><td><b>Double cabin</b></td><td>6 seats (two rows of 3, facing each other)</td><td>4 berths</td><td>Green</td></tr>
+  </table></div>
+  <ul>
+    <li>For 2 or more tickets it suggests seats <b>in the same cabin</b>, single cabins first, and tells you if no cabin has enough free seats.</li>
+    <li>The forward/backward guess is switched off in cabins: the two rows face each other, and berths are for lying down.</li>
+    <li>It works out the cabins from how the seats are grouped on the map. A group whose size it doesn't recognise is left without a tag instead of guessed.</li>
+  </ul>
   <p class="small">Not every train has every class. The codes are Bangladesh Railway's own. The meanings come from travel guides
      (<a href="https://www.seat61.com/Bangladesh.htm">Seat61</a>, <a href="https://www.bdrailwayinfo.org/seat-information">bdrailwayinfo.org</a>)
      and a Bangla explainer video, which agree on all but <code>AC_CHAIR</code>. Fares change, so check the price on the site.</p>
@@ -304,6 +318,7 @@ Bangladesh Railway or Shohoz. It only helps you use the normal ticket website (e
     <tr><td>“Can't reach the tab” or no name shown</td><td>Press ↻ re-check — the extension now connects to a ticket tab that was open before it was installed or updated. If it still fails, reload that tab.</td></tr>
     <tr><td>Red ✖ not logged in</td><td>Log in at eticket.railway.gov.bd, then press ↻ re-check. If you used train.shohoz.com before: logins don't carry over between the two sites, so log in once on eticket.railway.gov.bd.</td></tr>
     <tr><td>“Session expired” in the status box</td><td>Log in again. The alarm rings so you notice.</td></tr>
+    <tr><td>“That train isn't on this route”</td><td>The train you picked earlier doesn't run between these two stations (usually it was left over from another trip). Open the panel and pick a train from the list. The panel now removes a leftover train by itself and tells you.</td></tr>
     <tr><td>No trains in the list</td><td>Open eticket.railway.gov.bd in a tab, log in, then press ⟳ Load trains.</td></tr>
     <tr><td>No sound</td><td>Tools → 🔔 Test alarm sound. Check the computer volume and that the browser isn't muted.</td></tr>
     <tr><td>No notifications</td><td>Allow notifications for the browser in your computer's settings, and turn off Do Not Disturb.</td></tr>

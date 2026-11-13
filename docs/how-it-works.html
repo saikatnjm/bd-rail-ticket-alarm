@@ -174,6 +174,7 @@ User    clicks seats → CONTINUE PURCHASE → OTP → pays</code></pre>
         The coach is split at the seat map's middle gap (<code>pickByLayout()</code>), not at a fixed seat number.
         Trips to or from the Cox's Bazar line flip at Chattogram. Routes that don't start or end in Dhaka get no guess.
         Nothing official backs this, and a coach attached the other way round makes it wrong.</li>
+    <li><b>Cabins are read off the map's shape.</b> <code>findCabins()</code> groups seats that sit close together and calls a group of 6 seats (or 4 berths) a double cabin and 3 seats (or 2 berths) a single cabin, per travel guides. Any other group size gets no tag. If the site redraws cabin coaches differently, the tags quietly disappear.</li>
     <li><b>Seat outlines see one coach at a time</b> — the one on screen. The “fuller coach” hint comes from the coach dropdown.</li>
     <li><b>Clock accuracy is about half a second.</b> Plenty for this, but not millisecond-exact.</li>
     <li><b>Desktop only.</b> No phone browsers.</li>

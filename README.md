@@ -34,6 +34,7 @@ It rings the moment your train opens and takes you straight to BOOK NOW and the 
 - Outlines good seats: the rows beside the coach's middle gap, side by side for 2+ tickets (never across the aisle), or your preferred coaches/seats
 - **New:** suggests forward-facing seats first and shows which way each suggested seat likely faces (⬆ forward, ⬇ backward, ⬆→⬇ when the train turns around at Chattogram). It's a common rule of thumb, not official, so check when you board
 - **New:** explains class codes (S_CHAIR, SNIGDHA, AC_B…) in plain words on the ticket site and in the panel: AC or not, berth to sleep on or seat
+- **New:** on cabin classes (AC_B, AC_S, F_BERTH, F_SEAT) the seat map outlines each single or double cabin, and seats for 2+ people are suggested in the same cabin
 - Login indicator, saved trips, recent runs, full English/Bangla UI, classic or glossy glass look
 
 ## What it never does
