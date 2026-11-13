@@ -158,7 +158,13 @@
         <button id="delPreset" class="minor" data-i18n="delPreset">✕</button>
       </div>
       <button id="checkSeats" class="minor" data-i18n="checkSeats">📊 Check seats now</button>
-      <button id="soundTest" class="minor" data-i18n="soundTest">🔔 Test alarm sound</button>
+      <div class="presetRow">
+        <select id="alarmSound">
+          <option value="horn" data-i18n="soundHorn">🚆 Train horn</option>
+          <option value="beep" data-i18n="soundBeep">🔔 Beeps</option>
+        </select>
+        <button id="soundTest" class="minor" data-i18n="soundTest">▶ Test alarm sound</button>
+      </div>
     </details>
 
     <div id="status"></div>

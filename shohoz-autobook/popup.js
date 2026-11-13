@@ -1,7 +1,7 @@
 const FIELDS = [
   "fromCity", "toCity", "trainQuery", "classPriority", "seatCount", "journeyDate",
   "triggerTime", "preferredCoaches", "preferredSeats", "pollIntervalMs",
-  "maxWaitMinutes",
+  "maxWaitMinutes", "alarmSound",
 ];
 const PRESET_FIELDS = [
   "fromCity", "toCity", "trainQuery", "classPriority", "seatCount",
@@ -682,7 +682,8 @@ $("checkSeats").onclick = async () => {
 };
 
 // ---------- alarm sound test (same audio path as the real alarm) ----------
-$("soundTest").onclick = () => {
+$("soundTest").onclick = async () => {
+  await saveConfig(); // play the sound picked just now
   chrome.runtime.sendMessage({ type: "siren", on: true, once: true });
 };
 

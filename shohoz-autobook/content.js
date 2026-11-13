@@ -554,10 +554,15 @@
   // ---------- seat map: shared helpers ----------
   const SEAT_TAKEN = /booked|hidden|selected|progress|blocked|disable|reserved/i;
   const isFreeSeat = (b) => !SEAT_TAKEN.test(b.className) && !b.disabled;
+  // "KHA-12" in chair and seat coaches; berth coaches add the berth level:
+  // "GHA-LO-1" (lower), "GHA-UP-4" (upper).
+  const seatName = (b) => (b.textContent || "").replace(/\s+/g, "").toUpperCase();
   function seatButtons() {
     return [...document.querySelectorAll("button.btn-seat")]
-      .filter((b) => /^[A-Z]{1,5}-\d{1,3}$/.test((b.textContent || "").trim()));
+      .filter((b) => /^[A-Z]{1,5}(-[A-Z]{1,4})?-\d{1,3}$/.test(seatName(b)));
   }
+  const berthLevel = (name) => (/-LO-/.test(name) ? "lower" : /-UP-/.test(name) ? "upper" : "");
+  const berthWord = (name) => ({ lower: tx(" · lower", " · নিচের"), upper: tx(" · upper", " · উপরের"), "": "" })[berthLevel(name)];
   // The class whose seat map is open: the class box the user clicked.
   function openClass(nearEl) {
     const el = nearEl?.closest("app-single-trip")?.querySelector(".single-seat-class.selected .seat-class-name") ||
@@ -691,7 +696,7 @@
     for (const b of document.querySelectorAll(".ab-suggest")) b.classList.remove("ab-suggest");
 
     const seats = btns.map((b) => ({
-      seat_number: b.textContent.trim(),
+      seat_number: seatName(b),
       seat_availability: isFreeSeat(b) ? 1 : 0,
       el: b,
     }));
@@ -712,6 +717,11 @@
     };
     const byNumber = (list) => scoreAndPick(list, want, cfg.preferredCoaches || "", cfg.preferredSeats || "").picked;
     let picked = !favFree && want > 1 && cabins.length ? pickInCabin(cabins, seats, want) : null;
+    // One ticket in a berth coach: a lower berth if any is free (no climbing).
+    const lowers = seats.filter((x) => x.seat_availability && berthLevel(x.seat_number) === "lower");
+    if (!picked?.length && !favFree && want === 1 && lowers.length) {
+      picked = pickByLayout(seats.map((x) => (lowers.includes(x) ? x : { ...x, seat_availability: 0 })), 1, cfg.preferredCoaches || "", null);
+    }
     if (!picked?.length) picked = !favFree && pickByLayout(seats, want, cfg.preferredCoaches || "", prefer);
     if (!picked && prefer && !favFree) {
       const fwd = byNumber(seats.filter((s) => numHalf(s) === prefer));
@@ -768,12 +778,16 @@
             ? tx(`\n🚪 All in one cabin: ${cabinText(own[0])}`, `\n🚪 সব একই কেবিনে: ${cabinText(own[0])}`)
             : `\n🚪 ${cabinText(own[0])}`;
         } else if (picked.length > 1 && cabins.length) {
-          text += tx(`\n⚠ No cabin has ${want} free seats, so these are in different cabins.`,
-                     `\n⚠ কোনো কেবিনে ${want.toLocaleString("bn-BD")}টি খালি সিট নেই, তাই এগুলো আলাদা কেবিনে।`);
+          const unit = cabins[0].berth ? tx("berths", "বার্থ") : tx("seats", "সিট");
+          text += tx(`\n⚠ No cabin has ${want} free ${unit}, so these are in different cabins.`,
+                     `\n⚠ কোনো কেবিনে ${want.toLocaleString("bn-BD")}টি খালি ${unit} নেই, তাই এগুলো আলাদা কেবিনে।`);
         }
         if (cabins[0] && !cabins[0].berth) {
           text += tx("\nThe two rows in a cabin face each other.", "\nকেবিনের দুই সারির সিট মুখোমুখি।");
         }
+      }
+      if (seats.some((x) => berthLevel(x.seat_number))) {
+        text += tx("\n🛏️ LO = lower berth, UP = upper berth.", "\n🛏️ LO = নিচের বার্থ, UP = উপরের বার্থ।");
       }
       if (prefer && !favFree && picked.some((s) => s.half !== prefer)) {
         text += tx(`\n(No ${want > 1 ? "side-by-side " : ""}forward-facing seats free in this coach.)`,
@@ -781,7 +795,7 @@
       }
       setSub(text);
       showChips(picked.map((s) => ({
-        label: s.seat_number + (!s.facing ? "" : s.facing.flipsAtCtg ? (s.facing.fwd ? " ⬆→⬇" : " ⬇→⬆")
+        label: s.seat_number + berthWord(s.seat_number) + (!s.facing ? "" : s.facing.flipsAtCtg ? (s.facing.fwd ? " ⬆→⬇" : " ⬇→⬆")
           : s.facing.fwd ? " ⬆" : " ⬇"), el: s.el,
       })));
     } else if (others.length) {

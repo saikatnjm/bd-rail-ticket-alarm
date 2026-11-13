@@ -23,6 +23,7 @@ const DEFAULTS = {
   startLeadMs: 500,          // tiny head start so the first search lands ~at the release second
   pollIntervalMs: 700,
   maxWaitMinutes: 5,
+  alarmSound: "horn",        // "horn" = train horn, "beep" = the classic beeps
 };
 
 const SALE_WINDOW_DAYS = 10; // BD Railway sells tickets up to 10 days ahead
@@ -201,7 +202,8 @@ async function siren(on, once = false) {
       });
     } catch (_) {} // already open
   }
-  chrome.runtime.sendMessage({ target: "offscreen", type: on ? "siren-start" : "siren-stop", once })
+  const sound = on ? (await getConfig()).alarmSound : undefined;
+  chrome.runtime.sendMessage({ target: "offscreen", type: on ? "siren-start" : "siren-stop", once, sound })
     .catch(() => {});
 }
 

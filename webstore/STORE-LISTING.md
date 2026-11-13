@@ -187,7 +187,7 @@ The extension needs a eticket.railway.gov.bd account to search trains (Banglades
 
 What you can check without an account:
 1. Open the panel, type "Dhaka" and "Chattogram" as From/To, tap a date: it shows when that date's tickets go on sale.
-2. Tools → "Test alarm sound" plays the alarm.
+2. Tools → "▶ Test" (next to the alarm sound) plays the alarm.
 3. The বাং button switches the panel to Bangla.
 
 The extension never automates login, OTP, the site's bot check, seat reservation or payment. Full guide: https://saikatnjm.github.io/bd-rail-ticket-alarm/
